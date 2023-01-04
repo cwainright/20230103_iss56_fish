@@ -56,9 +56,9 @@ presence_absence <- data.frame(
     present_in_results_list = rep(NA,ncol(example_data))
     )
 for (i in 1:length(results_list)){
-    for (j in 1:ncol(example_data)){
+    for (j in 1:nrow(presence_absence)){
         presence_absence$example_data_colname[j] <- colnames(example_data)[j]
-        presence_absence$present_in_results_list[j] <- colnames(example_data)[j] %in% colnames(results_list[i])
+        presence_absence$present_in_results_list[j] <- tolower(colnames(example_data)[j]) %in% tolower(colnames(results_list[i])) # try to match colnames and ignore case: tolower()
         presence_absence$present_in_results_list <- ifelse(
             presence_absence$present_in_results_list[j] == TRUE,
             paste("column present in", results_list[i]),
@@ -66,7 +66,6 @@ for (i in 1:length(results_list)){
         )
     }
 }
-
 
 # try to re-build `example_data` from `results_list`
 
