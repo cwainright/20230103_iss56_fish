@@ -12,6 +12,7 @@
 library(data.table)
 library(tidyverse)
 library(prettyR)
+library(dplyr)
 
 # look at example data
 example_data <- data.table::fread("data/data_fish_MBSS.csv") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Examples/data_fish_MBSS.csv?d=wf74aa7432fac473dbe2565ac0380abac&csf=1&web=1&e=cNWRcH
@@ -23,10 +24,24 @@ prettyR::describe(example_data)
 library(RODBC)
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
-RODBC::sqlTables(con) # test db connection
-query <- "SELECT TOP 5 * FROM tlu_Fish" # sql query; https://stackoverflow.com/questions/4551112/access-database-limit-keyword
-results <- RODBC::sqlQuery(con, query) # execute sql query on db connection, save to `results`
-RODBC::odbcCloseAll() # close db connection
+db_objs <- RODBC::sqlTables(con) # test db connection
+tbl_names <- db_objs %>%
+    subset(TABLE_TYPE == "TABLE") %>%
+    select(TABLE_NAME)
 
+# make list of queries so we can extract a few rows from each table
+qry_list <- vector(mode="list", length=nrow(tbl_names))
+names(qry_list) <- tbl_names$TABLE_NAME
+for (i in 1:length(qry_list)){
+    qry_list[[i]] <- paste("SELECT TOP 2 * FROM", names(qry_list)[i])
+}
+results_list <- vector(mode="list", length=nrow(tbl_names))
+names(results_list) <- tbl_names$TABLE_NAME
+for (i in 1:length(qry_list)){
+    results_list[[i]] <- tryCatch(expr = {RODBC::sqlQuery(con, qry_list[[i]])},
+                                  error = {"there was an error with the query"},
+                                  finally = print("query run has completed"))
+}
+RODBC::odbcCloseAll() # close db connection
 
 # observations about `example_data` and `results`
