@@ -44,4 +44,32 @@ for (i in 1:length(qry_list)){
 }
 RODBC::odbcCloseAll() # close db connection
 
-# observations about `example_data` and `results`
+# observations about `example_data` and `results_list`
+colnames(example_data)
+names(results_list)
+
+
+#----- column-by-column figure out where the data are
+# can we get lucky and just find a column name that matches?
+presence_absence <- data.frame(
+    example_data_colname = rep(NA,ncol(example_data)),
+    present_in_results_list = rep(NA,ncol(example_data))
+    )
+for (i in 1:length(results_list)){
+    for (j in 1:ncol(example_data)){
+        presence_absence$example_data_colname[j] <- colnames(example_data)[j]
+        presence_absence$present_in_results_list[j] <- colnames(example_data)[j] %in% colnames(results_list[i])
+        presence_absence$present_in_results_list <- ifelse(
+            presence_absence$present_in_results_list[j] == TRUE,
+            paste("column present in", results_list[i]),
+            "column absent from all tables in results_list"
+        )
+    }
+}
+
+
+# try to re-build `example_data` from `results_list`
+
+head(example_data[,1], 2) # example_data$SAMPLEID
+results_list$tbl_Fish_Events$Fish_Event_ID
+results_list$tbl_Fish_Events$Event_ID
