@@ -12,11 +12,14 @@
 library(data.table)
 library(tidyverse)
 library(prettyR)
+
+# look at example data
 example_data <- data.table::fread("data/data_fish_MBSS.csv") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Examples/data_fish_MBSS.csv?d=wf74aa7432fac473dbe2565ac0380abac&csf=1&web=1&e=cNWRcH
 # example_data <- load("data/data_fish_MBSS.rda")
 dplyr::glimpse(example_data)
 prettyR::describe(example_data)
 
+# look at database
 library(RODBC)
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
