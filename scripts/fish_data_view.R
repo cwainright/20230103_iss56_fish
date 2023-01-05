@@ -35,13 +35,18 @@ names(qry_list) <- tbl_names$TABLE_NAME
 for (i in 1:length(qry_list)){
     qry_list[[i]] <- paste("SELECT TOP 2 * FROM", names(qry_list)[i])
 }
-results_list <- vector(mode="list", length=nrow(tbl_names))
-names(results_list) <- tbl_names$TABLE_NAME
-for (i in 1:length(qry_list)){
-    results_list[[i]] <- tryCatch(expr = {RODBC::sqlQuery(con, qry_list[[i]])},
-                                  error = {"there was an error with the query"},
-                                  finally = print("query run has completed"))
+
+getQueryResults <- function(qryList, connection){
+    results_list <- vector(mode="list", length=length(qryList))
+    names(results_list) <- names(qryList)
+    for(i in 1:length(qryList)){
+        results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]])
+    }
+    # return (results_list)
+    assign("results_list", results_list, envir = globalenv())
 }
+getQueryResults(qryList = qry_list, connection = con)
+
 RODBC::odbcCloseAll() # close db connection
 
 # observations about `example_data` and `results_list`
