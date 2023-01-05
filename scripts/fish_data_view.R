@@ -37,6 +37,41 @@ for (i in 1:length(qry_list)){
 }
 
 getQueryResults <- function(qryList, connection){
+    tryCatch(
+        expr = {
+            results_list <- vector(mode="list", length=length(qryList))
+            names(results_list) <- names(qryList)
+            for(i in 1:length(qryList)){
+                results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]])
+            }
+            # return (results_list)
+            assign("results_list", results_list, envir = globalenv())
+            message(
+                for(j in 1:length(qryList)){
+                    print(paste("Query for", names(qryList)[j], "ran successfully"))
+                }
+            )
+        },
+        error = function(e){
+            message(
+                for(x in 1:length(qryList)){
+                    print(paste(names(qryList)[j], "query failed:", e))
+                }
+            )
+        },
+        finally = {
+            message("All queries have been executed")
+        }
+    )
+}
+getQueryResults(qryList = qry_list, connection = con)
+
+RODBC::odbcCloseAll() # close db connection
+
+
+
+
+getQueryResults <- function(qryList, connection){
     results_list <- vector(mode="list", length=length(qryList))
     names(results_list) <- names(qryList)
     for(i in 1:length(qryList)){
@@ -45,14 +80,20 @@ getQueryResults <- function(qryList, connection){
     # return (results_list)
     assign("results_list", results_list, envir = globalenv())
 }
-getQueryResults(qryList = qry_list, connection = con)
 
-RODBC::odbcCloseAll() # close db connection
 
-# observations about `example_data` and `results_list`
-colnames(example_data)
-names(results_list)
 
+
+# 
+# getQueryResults <- function(qryList, connection){
+#     results_list <- vector(mode="list", length=length(qryList))
+#     names(results_list) <- names(qryList)
+#     for(i in 1:length(qryList)){
+#         results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]])
+#     }
+#     # return (results_list)
+#     assign("results_list", results_list, envir = globalenv())
+# }
 
 #----- column-by-column figure out where the data are
 # can we get lucky and just find a column name that matches?
