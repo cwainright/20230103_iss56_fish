@@ -44,56 +44,27 @@ getQueryResults <- function(qryList, connection){
             for(i in 1:length(qryList)){
                 results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]])
             }
-            # return (results_list)
             assign("results_list", results_list, envir = globalenv())
-            message(
-                for(j in 1:length(qryList)){
-                    print(paste("Query for", names(qryList)[j], "ran successfully"))
-                }
-            )
-        },
-        error = function(e){
-            message(
-                for(x in 1:length(qryList)){
-                    print(paste(names(qryList)[j], "query failed:", e))
+            message( # console messaging
+                for(j in 1:length(qryList)){ # print a message for each query
+                    if(class(results_list[[j]]) != "data.frame"){ # if the query result isn't a data frame
+                        e <- results_list[[j]][1] # grab the ODBC error message from [[j]][1]
+                        print(paste(names(results_list)[j], "query failed:", e)) # print to console that an error occurred
+                    } else {
+                        print(paste("Query for", names(qryList)[j], "ran successfully")) # print to console that query ran successfully
+                    }
                 }
             )
         },
         finally = {
-            message("All queries have been executed")
+            message("All queries have been executed") # message indicating the function job completed
         }
     )
 }
+
 getQueryResults(qryList = qry_list, connection = con)
 
 RODBC::odbcCloseAll() # close db connection
-
-
-
-
-getQueryResults <- function(qryList, connection){
-    results_list <- vector(mode="list", length=length(qryList))
-    names(results_list) <- names(qryList)
-    for(i in 1:length(qryList)){
-        results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]])
-    }
-    # return (results_list)
-    assign("results_list", results_list, envir = globalenv())
-}
-
-
-
-
-# 
-# getQueryResults <- function(qryList, connection){
-#     results_list <- vector(mode="list", length=length(qryList))
-#     names(results_list) <- names(qryList)
-#     for(i in 1:length(qryList)){
-#         results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]])
-#     }
-#     # return (results_list)
-#     assign("results_list", results_list, envir = globalenv())
-# }
 
 #----- column-by-column figure out where the data are
 # can we get lucky and just find a column name that matches?
