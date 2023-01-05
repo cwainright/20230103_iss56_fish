@@ -36,22 +36,22 @@ for (i in 1:length(qry_list)){
     qry_list[[i]] <- paste("SELECT TOP 2 * FROM", names(qry_list)[i])
 }
 
-getQueryResults <- function(qryList, connection){
+getQueryResults <- function(qryList, connection){ # function with two arguments: 1.`qryList` (a list-object of query char strings) 2. `connection` an active odbc connection
     tryCatch(
         expr = {
-            results_list <- vector(mode="list", length=length(qryList))
-            names(results_list) <- names(qryList)
-            for(i in 1:length(qryList)){
-                results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]])
+            results_list <- vector(mode="list", length=length(qryList)) # instantiate empty list to hold query results
+            names(results_list) <- names(qryList) # name elements in `results_list` to match `qryList` element names
+            for(i in 1:length(qryList)){ # loop runs once per query
+                results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]]) # query the db and save result to `results_list`
             }
-            assign("results_list", results_list, envir = globalenv())
+            assign("results_list", results_list, envir = globalenv()) # save query results as environment object `results_list`
             message( # console messaging
                 for(j in 1:length(qryList)){ # print a message for each query
                     if(class(results_list[[j]]) != "data.frame"){ # if the query result isn't a data frame
                         e <- results_list[[j]][1] # grab the ODBC error message from [[j]][1]
-                        print(paste(names(results_list)[j], "query failed:", e)) # print to console that an error occurred
+                        cat(paste("'", names(results_list)[j], "'", " query failed. Error message: ", "'", e, "'", "\n", sep = "")) # print to console that an error occurred
                     } else {
-                        print(paste("Query for", names(qryList)[j], "ran successfully")) # print to console that query ran successfully
+                        cat(paste("Query for ", "'", names(qryList)[j], "'", " executed successfully", "\n", sep = "")) # print to console that query ran successfully
                     }
                 }
             )
