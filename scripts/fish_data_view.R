@@ -4,7 +4,11 @@
 
 #----- The script should
 # Query the database:
-  # Return data needed to populate columns in data/data_fish_MBSS.rda
+  # Return data needed to populate columns in 'data/NCRN_BSS_EDD_20230105_1300.xlsx'
+    # Produce an .xlsx with three tabs:
+    # 1) Locations
+    # 2) Activities
+    # 3) Results
 # Wrangle query results to match data format in data/data_fish_MBSS.rda
   # colnames
   # column order
@@ -13,12 +17,16 @@ library(data.table)
 library(tidyverse)
 library(prettyR)
 library(dplyr)
+library(readxl)
 
 # look at example data
-example_data <- data.table::fread("data/data_fish_MBSS.csv") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Examples/data_fish_MBSS.csv?d=wf74aa7432fac473dbe2565ac0380abac&csf=1&web=1&e=cNWRcH
+# example_data <- data.table::fread("data/data_fish_MBSS.csv") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Examples/data_fish_MBSS.csv?d=wf74aa7432fac473dbe2565ac0380abac&csf=1&web=1&e=cNWRcH
+example_locations <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Locations")
+example_activites <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Activities")
+example_results <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Results")
 # example_data <- load("data/data_fish_MBSS.rda")
 dplyr::glimpse(example_data)
-prettyR::describe(example_data)
+prettyR::describe(example_locations)
 
 # look at database
 library(RODBC)
@@ -36,31 +44,7 @@ for (i in 1:length(qry_list)){
     qry_list[[i]] <- paste("SELECT TOP 2 * FROM", names(qry_list)[i])
 }
 
-getQueryResults <- function(qryList, connection){ # function with two arguments: 1.`qryList` (a list-object of query char strings) 2. `connection` an active odbc connection
-    tryCatch(
-        expr = {
-            results_list <- vector(mode="list", length=length(qryList)) # instantiate empty list to hold query results
-            names(results_list) <- names(qryList) # name elements in `results_list` to match `qryList` element names
-            for(i in 1:length(qryList)){ # loop runs once per query
-                results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]]) # query the db and save result to `results_list`
-            }
-            assign("results_list", results_list, envir = globalenv()) # save query results as environment object `results_list`
-            message( # console messaging
-                for(j in 1:length(qryList)){ # print a message for each query
-                    if(class(results_list[[j]]) != "data.frame"){ # if the query result isn't a data frame
-                        e <- results_list[[j]][1] # grab the ODBC error message from [[j]][1]
-                        cat(paste("'", names(results_list)[j], "'", " query failed. Error message: ", "'", e, "'", "\n", sep = "")) # print to console that an error occurred
-                    } else {
-                        cat(paste("Query for ", "'", names(qryList)[j], "'", " executed successfully", "\n", sep = "")) # print to console that query ran successfully
-                    }
-                }
-            )
-        },
-        finally = {
-            message("All queries have been executed") # message indicating the function job completed
-        }
-    )
-}
+source("scripts/getQueryResults.R") # equivalent to python "from x import function"
 
 getQueryResults(qryList = qry_list, connection = con)
 
@@ -89,3 +73,5 @@ for (i in 1:length(results_list)){
 head(example_data[,1], 2) # example_data$SAMPLEID
 results_list$tbl_Fish_Events$Fish_Event_ID
 results_list$tbl_Fish_Events$Event_ID
+
+
