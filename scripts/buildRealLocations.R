@@ -310,9 +310,9 @@ real_locations[42] <- NA # design view db.tbl_Locations
 # check colname and order
 for(i in 1:ncol(real_locations)){
     if(colnames(real_locations)[i] == colnames(example_locations)[i]){
-        cat(paste("real_locations.", colnames(real_locations)[i], " matched example_locations.", colnames(example_locations)[i]), "\n", sep = "")
+        cat(paste(paste0("`real_locations.", colnames(real_locations)[i], "`"), paste0(" MATCHED `example_locations.", colnames(example_locations)[i], "`"), "\n", sep = ""))
     } else {
-        cat(paste("mismatching columns: real_locations.", colnames(real_locations)[i], " and example_locations.", colnames(example_locations)[i]), "\n", sep = "")
+        cat(paste(paste0("ERROR: `real_locations.", colnames(real_locations)[i], "`"), paste0(" does not match `example_locations.", colnames(example_locations)[i], "`")), "\n", sep = "")
     }
 }
 
