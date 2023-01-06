@@ -13,7 +13,7 @@ buildRealLocations <- function(){
             #----- load project functions
             source("scripts/getQueryResults.R") # equivalent to python "from x import function"
             # load example data
-            example_locations <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Locations")
+            example_locations <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Locations") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNDataManagement/Shared%20Documents/General/Standards/Data-Standards/EQuIS-WQX-EDD/NCRN_BSS_EDD_20230105_1300.xlsx?d=w8c283fde9cbd4af480945c8c8bd94ff6&csf=1&web=1&e=7Y9W1M
             
             # Query db
             db_objs <- RODBC::sqlTables(con) # test db connection
