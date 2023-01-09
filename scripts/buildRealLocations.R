@@ -1,7 +1,7 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildRealLocations <- function(database, connection){
+buildRealLocations <- function(connection){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -89,7 +89,7 @@ buildRealLocations <- function(database, connection){
             real[40] <- NA
             real[41] <- NA
             real[42] <- NA
-            assign("real", real, envir = globalenv())
+            assign("real_locations", real, envir = globalenv())
             # assign("example", example, envir = globalenv())
             
             # error-checking:
@@ -107,7 +107,7 @@ buildRealLocations <- function(database, connection){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildRealLocations()` executed successfully; `real` colnames match `example`"
+                    "`buildRealLocations()` executed successfully...\nOutput saved as `real_locations` in global environment."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
