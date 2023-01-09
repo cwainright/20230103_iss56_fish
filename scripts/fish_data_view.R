@@ -9,9 +9,6 @@
     # 1) Locations
     # 2) Activities
     # 3) Results
-# Wrangle query results to match data format in data/data_fish_MBSS.rda
-  # colnames
-  # column order
 
 #----- load external libraries
 library(data.table)
@@ -22,18 +19,20 @@ library(RODBC)
 
 #----- load project functions
 source("scripts/buildRealLocations.R")
-# source("scripts/buildRealActivities.R")
+source("scripts/buildRealActivities.R")
 # source("scripts/buildRealResults.R")
+# source("scripts/buildEDD.R")
 
 # Connect to db
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
-buildRealLocations(database = db, connection = con)
-# buildRealActivities()
-# buildRealActivities()
+buildRealLocations(connection = con)
+buildRealActivities(connection = con)
+# buildRealResults()
 
 RODBC::odbcCloseAll() # close db connection
 
+# buildEDD(connection = con)
 #-----
 # Build xlsx
 
