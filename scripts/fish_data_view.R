@@ -18,17 +18,17 @@ library(data.table)
 library(tidyverse)
 library(dplyr)
 library(readxl)
+library(RODBC)
 
 #----- load project functions
 source("scripts/buildRealLocations.R")
-source("scripts/buildRealActivities.R")
-source("scripts/buildRealResults.R")
+# source("scripts/buildRealActivities.R")
+# source("scripts/buildRealResults.R")
 
 # Connect to db
-library(RODBC)
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
-buildRealLocations()
+buildRealLocations(database = db, connection = con)
 # buildRealActivities()
 # buildRealActivities()
 
