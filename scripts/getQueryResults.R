@@ -1,3 +1,6 @@
+# query a database and return results to a list
+# a module for `scripts/fish_data_view.R`
+
 getQueryResults <- function(qryList, connection){ # function with two arguments: 1.`qryList` (a list-object of query char strings) 2. `connection` an active odbc connection
     tryCatch(
         expr = {
@@ -25,7 +28,7 @@ getQueryResults <- function(qryList, connection){ # function with two arguments:
             }
         },
         finally = {
-            message("All queries have been executed") # message indicating the function job completed
+            message("All queries have been executed\n") # message indicating the function job completed
         }
     )
 }
