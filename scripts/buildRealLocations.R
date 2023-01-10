@@ -31,7 +31,7 @@ buildRealLocations <- function(connection){
                 qry_list[[i]] <- paste("SELECT * FROM", names(qry_list)[i])
             }
             
-            getQueryResults(qryList = qry_list, connection = con)
+            results_list <- getQueryResults(qryList = qry_list, connection = con)
             
             # tidy up
             rm(db_objs)
@@ -100,7 +100,8 @@ buildRealLocations <- function(connection){
             real[40] <- NA # "Well_Hole_Depth"
             real[41] <- NA # "Well_Hole_Depth_Unit"
             real[42] <- NA # "Well_Status"
-            assign("real_locations", real, envir = globalenv())
+            
+            # assign("locations", real, envir = globalenv())
             # assign("example", example, envir = globalenv())
             
             # error-checking:
@@ -118,13 +119,14 @@ buildRealLocations <- function(connection){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildRealLocations()` executed successfully...\nOutput saved as `real_locations` in global environment."
+                    "`buildRealLocations()` executed successfully...\nOutput saved as `locations` in global environment."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
                     }
                 }
             )
+            return(real)
         }
     )
 }

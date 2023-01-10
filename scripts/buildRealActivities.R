@@ -37,7 +37,7 @@ buildRealActivities <- function(connection){
                 qry_list[[i]] <- paste("SELECT * FROM", names(qry_list)[i])
             }
                 
-            getQueryResults(qryList = qry_list, connection = con)
+            results_list <- getQueryResults(qryList = qry_list, connection = con)
             
             # tidy up
             rm(db_objs)
@@ -173,12 +173,12 @@ buildRealActivities <- function(connection){
             }
             # "Effort_Unit"
             for (i in 1:nrow(real)){ # for each row
-                if(!is.na(real[i,62])){ # 75 m is the prescribed e-fishing reach distance; 
-                    real[i,63] <- "s" # units are meters
+                if(!is.na(real[i,62])){
+                    real[i,63] <- "seconds" # units are seconds
                 }
             }
             # test <- cbind(real_activities[62:63], df$Pass_1_End, df$Pass_1_Start, df$Pass_2_End, df$Pass_2_Start) # check the `$Effort` math in real[62]
-            assign("real_activities", real, envir = globalenv())
+            # assign("activities", real, envir = globalenv())
             # assign("example", example, envir = globalenv())
             
             # error-checking:
@@ -196,13 +196,14 @@ buildRealActivities <- function(connection){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildRealActivities()` executed successfully...\nOutput saved as `real_activities` in global environment."
+                    "`buildRealActivities()` executed successfully...\nOutput saved as `activities` in global environment."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
                     }
                 }
             )
+            return(real)
         }
     )
 }
