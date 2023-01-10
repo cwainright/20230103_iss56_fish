@@ -3,6 +3,31 @@
 # database is from: https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 # a module for `scripts/fish_data_view.R`
 
-# source("scripts/buildRealLocations.R")
-# source("scripts/buildRealActivities.R")
-# source("scripts/buildRealResults.R")
+
+
+# build example
+# a module for `scripts/fish_data_view.R`
+
+buildEDD <- function(connection){
+    tryCatch(
+        expr = {
+            #----- load external libraries
+            suppressWarnings(suppressMessages(library(openxlsx)))
+            
+            #----- load project functions
+            source("scripts/buildRealLocations.R")
+            source("scripts/buildRealActivities.R")
+            source("scripts/buildRealResults.R") # equivalent to python "from x import function"
+            
+            activities <- buildRealActivities(connection = con)
+            locations <- buildRealLocations(connection = con)
+            results <- buildRealResults(connection = con)
+            
+            list_of_datasets <- list("Locations" = locations, "Activities" = activities, "Results" = results)
+            assign("list_of_datasets", list_of_datasets, envir = globalenv())
+        },
+        finally = {
+            "`buildEDD() executed successfully"
+        }
+    )
+}
