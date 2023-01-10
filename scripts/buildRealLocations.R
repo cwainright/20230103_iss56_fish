@@ -33,7 +33,10 @@ buildRealLocations <- function(connection){
             
             getQueryResults(qryList = qry_list, connection = con)
             
-            # RODBC::odbcCloseAll() # close db connection
+            # tidy up
+            rm(db_objs)
+            rm(tbl_names)
+            rm(qry_list)
             
             #----- re-build `example` from `results_list`
             
