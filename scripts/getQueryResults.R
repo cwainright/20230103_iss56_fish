@@ -9,8 +9,7 @@ getQueryResults <- function(qryList, connection){ # function with two arguments:
             for(i in 1:length(qryList)){ # loop runs once per query
                 results_list[[i]] <- RODBC::sqlQuery(connection, qryList[[i]]) # query the db and save result to `results_list`
             }
-            # return(results_list)
-            assign("results_list", results_list, envir = globalenv()) # save query results as environment object `results_list`
+            # assign("results_list", results_list, envir = globalenv()) # save query results as environment object `results_list`
             message( # console messaging
                 for(j in 1:length(qryList)){ # print a message for each query
                     if(class(results_list[[j]]) != "data.frame"){ # if the query result isn't a data frame
@@ -21,6 +20,7 @@ getQueryResults <- function(qryList, connection){ # function with two arguments:
                     }
                 }
             )
+            return(results_list)
         },
         error = {
             function(error_msg){
