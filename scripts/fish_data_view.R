@@ -20,7 +20,7 @@ library(RODBC)
 #----- load project functions
 source("scripts/buildRealLocations.R")
 source("scripts/buildRealActivities.R")
-# source("scripts/buildRealResults.R")
+source("scripts/buildRealResults.R")
 # source("scripts/buildEDD.R")
 
 # Connect to db
@@ -28,7 +28,7 @@ db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Strea
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
 buildRealLocations(connection = con)
 buildRealActivities(connection = con)
-# buildRealResults()
+buildRealResults(connection = con)
 
 RODBC::odbcCloseAll() # close db connection
 
