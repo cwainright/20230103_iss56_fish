@@ -39,6 +39,11 @@ buildRealActivities <- function(connection){
                 
             getQueryResults(qryList = qry_list, connection = con)
             
+            # tidy up
+            rm(db_objs)
+            rm(tbl_names)
+            rm(qry_list)
+            
             # make a flat dataframe from `results_list`
             df <- results_list$tbl_Fish_Events %>% select(-c(Fish_Move, Bottom_Visible, Water_Quality_2, Fish_Biomass_1, Fish_Biomass_2))
             df <- dplyr::left_join(df, results_list$tbl_Events %>% select(Event_ID, Protocol_ID, Start_Date, Start_Time, Location_ID, Comments, Event_Site_ID, Event_Group_ID), by = "Event_ID")
