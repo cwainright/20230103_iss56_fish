@@ -58,8 +58,8 @@ buildRealActivities <- function(connection){
             
             real[1] <- "NCRN" # "#Org_Code" 
             real[2] <- df$Protocol_Name # "Project_ID"
-            real[3] <- df$Event_Site_ID # "Location_ID" 
-            real[4] <- df$Fish_Event_ID # "Activity_ID"
+            real[3] <- df$Event_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
+            real[4] <- df$Fish_Event_ID # "Activity_ID" shared field with `real_locations.Activity_ID` and `real_results.Activity_ID`
             real[5] <- "Field Msr/Obs" # "Activity_Type"; choices are: 1) 'Field Msr/Obs' and 2) 'Sample-Routine'
             real[6] <- "Water" # "Medium"  choices are "Water", "Air", and "Other" in `example`
             real[7] <- NA # "Medium_Subdivision"
@@ -78,16 +78,17 @@ buildRealActivities <- function(connection){
             real[20] <- NA # "Activity_Depth_Reference"
             real[21] <- df$Loc_Name # "Additional_Location_Info"
             real[22] <- NA # "Activity_Sampler"; the person who did the sampling?
-            real[23] <- df$Entered_by # "Activity_Recorder"
-            # regex to extract strings matching pattern:
-            # String starts with (^) any character (*)
-            # followed by one or more (+) numbers ([0-9])
-            # followed by a dash (-)
-            # followed by one or more (+) numbers ([0-9])
-            # followed by a period (.)
-            # followed by one or more (+) numbers ([0-9])
+            # "Activity_Recorder"
+            real[23] <- df$Entered_by
             for (i in 1:nrow(real)){ # for each row
-                ifelse(stringr::str_detect(real$Activity_Recorder[i], "Event") == TRUE, # 75 m is the prescribed e-fishing reach distance; 
+                ifelse(stringr::str_detect(real$Activity_Recorder[i], "Event") == TRUE, # 'Event' ends up in some records, so we regex to remove
+                       # regex to extract strings matching pattern:
+                       # String starts with (^) any character (*)
+                       # followed by one or more (+) numbers ([0-9])
+                       # followed by a dash (-)
+                       # followed by one or more (+) numbers ([0-9])
+                       # followed by a period (.)
+                       # followed by one or more (+) numbers ([0-9])
                        real[i,23] <- stringr::str_extract(real[i,23], "^*([0-9])+-([0-9])+.([0-9])+"),
                        real[i,23] <- real[i,23])# units are meters
             }
@@ -147,9 +148,31 @@ buildRealActivities <- function(connection){
             real[59] <- NA # "Current_Speed"
             real[60] <- NA # "Current_Speed_Unit"
             real[61] <- NA # "Toxicity_Test_Type"
-            real[62] <- NA # "Effort" # we don't record stop time for fish events, so effort is unknown
-            real[63] <- NA # "Effort_Unit"
-            
+            # "Effort"
+            # we need to account for possible NA values since we're doing math
+            # we need to only do math if we have a valid start & end pair (i.e., use either pass 2 or pass 1 if only one pair is NA-free)
+            # if we have two valid start & end pairs, use both and sum them
+            for (i in 1:nrow(real)){
+                # scenario 1: Pass 1 has 2 NA-free values but there's a NA in Pass 2
+                if(!is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i]) & is.na(df$Pass_2_End[i]) | is.na(df$Pass_2_Start[i])){
+                    real[i,62] <- (df$Pass_1_End[i]-df$Pass_1_Start[i])
+                }
+                # scenario 2: Pass 2 has 2 NA-free values but there's a NA in Pass 1 
+                else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & is.na(df$Pass_1_End[i]) | is.na(df$Pass_1_Start[i])){
+                    real[i,62] <- (df$Pass_2_End[i]-df$Pass_2_Start[i])
+                }
+                # scenario 3: Both Pass 1 and Pass 2 are NA-free
+                else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & !is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i])){
+                    real[i,62] <- ((df$Pass_2_End[i]-df$Pass_2_Start[i]) + (df$Pass_1_End[i]-df$Pass_1_Start[i]))
+                }
+            }
+            # "Effort_Unit"
+            for (i in 1:nrow(real)){ # for each row
+                if(!is.na(real[i,62])){ # 75 m is the prescribed e-fishing reach distance; 
+                    real[i,63] <- "s" # units are meters
+                }
+            }
+            # test <- cbind(real_activities[62:63], df$Pass_1_End, df$Pass_1_Start, df$Pass_2_End, df$Pass_2_Start) # check the `$Effort` math in real[62]
             assign("real_activities", real, envir = globalenv())
             # assign("example", example, envir = globalenv())
             
