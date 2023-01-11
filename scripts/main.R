@@ -29,8 +29,8 @@ source("scripts/buildFish.R")
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 # db <- file.choose()
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
-buildEDD(connection = con, write = FALSE)
-buildFish(connection = con, write = FALSE)
+buildEDD(connection = con, write = TRUE)
+buildFish(connection = con, write = TRUE)
 
 RODBC::odbcCloseAll() # close db connection
 
