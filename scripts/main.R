@@ -23,14 +23,16 @@ library(openxlsx)
 # source("scripts/buildRealActivities.R")
 # source("scripts/buildRealResults.R")
 source("scripts/buildEDD.R")
-source("scripts/buildFish.R")
+source("scripts/buildBioMonTools.R")
+source("scripts/buildMarcView.R")
 
 # Connect to db
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 # db <- file.choose()
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
 buildEDD(connection = con, write = TRUE)
-buildFish(connection = con, write = TRUE)
+buildBioMonTools(connection = con, write = TRUE)
+buildMarcView(connection = con, write = TRUE)
 
 RODBC::odbcCloseAll() # close db connection
 
