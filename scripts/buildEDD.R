@@ -27,7 +27,7 @@ buildEDD <- function(connection, write){
             list_of_datasets <- list("Locations" = locations, "Activities" = activities, "Results" = results)
             assign("list_of_datasets", list_of_datasets, envir = globalenv())
             if(write == TRUE){
-                data.table::fwrite(real, file.choose())
+                openxlsx::write.xlsx(list_of_datasets, file = file.choose())
             }
         },
         finally = {
