@@ -1,7 +1,7 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildFish <- function(connection, write){
+buildBioMonTools <- function(connection, write){
     tryCatch(
         expr = {
             #----- load external libraries
