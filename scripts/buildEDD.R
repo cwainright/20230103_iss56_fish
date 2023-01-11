@@ -8,11 +8,12 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildEDD <- function(connection){
+buildEDD <- function(connection, write){
     tryCatch(
         expr = {
             #----- load external libraries
             suppressWarnings(suppressMessages(library(openxlsx)))
+            suppressWarnings(suppressMessages(library(data.table)))
             
             #----- load project functions
             source("scripts/buildRealLocations.R")
@@ -25,6 +26,9 @@ buildEDD <- function(connection){
             
             list_of_datasets <- list("Locations" = locations, "Activities" = activities, "Results" = results)
             assign("list_of_datasets", list_of_datasets, envir = globalenv())
+            if(write == TRUE){
+                data.table::fwrite(real, file.choose())
+            }
         },
         finally = {
             "`buildEDD() executed successfully"
