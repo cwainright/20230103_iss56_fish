@@ -1,7 +1,7 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildRealActivities <- function(connection){
+buildEDDActivities <- function(connection){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -177,6 +177,8 @@ buildRealActivities <- function(connection){
                     real[i,63] <- "seconds" # units are seconds
                 }
             }
+            real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            
             # test <- cbind(real_activities[62:63], df$Pass_1_End, df$Pass_1_Start, df$Pass_2_End, df$Pass_2_Start) # check the `$Effort` math in real[62]
             # assign("activities", real, envir = globalenv())
             # assign("example", example, envir = globalenv())
@@ -196,7 +198,7 @@ buildRealActivities <- function(connection){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildRealActivities()` executed successfully..."
+                    "`buildEDDActivities()` executed successfully..."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))

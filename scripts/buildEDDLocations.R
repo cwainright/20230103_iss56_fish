@@ -1,7 +1,7 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildRealLocations <- function(connection){
+buildEDDLocations <- function(connection){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -49,9 +49,27 @@ buildRealLocations <- function(connection){
             real[3] <- results_list$tbl_Locations$Location_ID # "Location_ID" shared field with `real_activities.Location_ID`
             real[4] <- results_list$tbl_Locations$Loc_Name # "Location_Name"
             real[5] <- "Creek" # "Location_Type"
-            real[6] <- results_list$tbl_Locations$Dec_Degrees_North # "Latitude"
-            real[7] <- results_list$tbl_Locations$Dex_Degrees_East # "Longitude"
+            real[6] <- sprintf("%.7f", results_list$tbl_Locations$Dec_Degrees_North) # "Latitude"
+            for(i in 1:nrow(real)){
+                # catch unrealistic latitude values
+                if(as.numeric(real[i,6])<10){
+                    real[i,6] <- NA
+                }
+            }
+            real[7] <- sprintf("%.7f", results_list$tbl_Locations$Dex_Degrees_East) # "Longitude"
+            for(i in 1:nrow(real)){
+                # catch unrealistic longitude values
+                if(as.numeric(real[i,7])>(-50)){
+                    real[i,7] <- NA
+                }
+            }
             real[8] <- "GPS-Unspecified" # "Lat_Lon_Method"
+            for(i in 1:nrow(real)){
+                # catch unrealistic longitude values
+                if(is.na(real[i,7]) | is.na(real[i,6])){
+                    real[i,8] <- NA
+                }
+            }
             real[9] <- toupper(results_list$tbl_Locations$Datum) # "Lat_Lon_Datum"
             real[10] <- NA # "Source_Map_Scale_Numeric" 
             real[11] <- NA # "Lat_Lon_Accuracy"
@@ -87,8 +105,15 @@ buildRealLocations <- function(connection){
             real[27] <- "US" # "Country_Code"
             real[28] <- results_list$tbl_Locations$State # "State_Code"
             real[29] <- results_list$tbl_Locations$County # "County_Name"
-            real[30] <- sprintf("%.3f", results_list$tbl_Locations$Catchment_Area) # "Drainage_Area"
-            real[31] <- "acre" # "Drainage_Area_Unit"; design view db.tbl_Locations
+            real[30] <- results_list$tbl_Locations$Catchment_Area # "Drainage_Area"
+            # "Drainage_Area_Unit"; design view db.tbl_Locations
+            for(i in 1:nrow(real)){
+                # catch NA catchment areas
+                if(!is.na(real[i,30])){
+                    real[i,31] <- "acre"
+                }
+            }
+            real[30] <- sprintf("%.3f", results_list$tbl_Locations$Catchment_Area) # round "Drainage_Area"
             real[32] <- NA # "Contributing_Area"
             real[33] <- NA # "Contributing_Area_Unit"
             real[34] <- NA # "Tribal_Land_Indicator"
@@ -100,6 +125,8 @@ buildRealLocations <- function(connection){
             real[40] <- NA # "Well_Hole_Depth"
             real[41] <- NA # "Well_Hole_Depth_Unit"
             real[42] <- NA # "Well_Status"
+
+            real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
             
             # assign("locations", real, envir = globalenv())
             # assign("example", example, envir = globalenv())
@@ -119,7 +146,7 @@ buildRealLocations <- function(connection){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildRealLocations()` executed successfully..."
+                    "`buildEDDLocations()` executed successfully..."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
