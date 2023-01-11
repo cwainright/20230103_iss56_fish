@@ -23,20 +23,19 @@ library(openxlsx)
 # source("scripts/buildRealActivities.R")
 # source("scripts/buildRealResults.R")
 source("scripts/buildEDD.R")
+source("scripts/buildFish.R")
 
 # Connect to db
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
-db <- file.choose()
+# db <- file.choose()
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
-buildEDD(connection = con)
-
-# openxlsx::write.xlsx(list_of_datasets, file = "data/test.xlsx")
-openxlsx::write.xlsx(list_of_datasets, file = file.choose())
+buildEDD(connection = con, write = TRUE)
+buildFish(connection = con, write = TRUE)
 
 RODBC::odbcCloseAll() # close db connection
 
-# buildEDD(connection = con)
 #-----
 # Build xlsx
 
-
+# to do:
+# re-write in python
