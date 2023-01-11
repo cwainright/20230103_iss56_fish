@@ -16,13 +16,13 @@ buildEDD <- function(connection, write){
             suppressWarnings(suppressMessages(library(data.table)))
             
             #----- load project functions
-            source("scripts/buildRealLocations.R")
-            source("scripts/buildRealActivities.R")
-            source("scripts/buildRealResults.R") # equivalent to python "from x import function"
+            source("scripts/buildEDDLocations.R")
+            source("scripts/buildEDDActivities.R")
+            source("scripts/buildEDDResults.R") # equivalent to python "from x import function"
             
-            activities <- buildRealActivities(connection = con)
-            locations <- buildRealLocations(connection = con)
-            results <- buildRealResults(connection = con)
+            activities <- buildEDDActivities(connection = con)
+            locations <- buildEDDLocations(connection = con)
+            results <- buildEDDResults(connection = con)
             
             list_of_datasets <- list("Locations" = locations, "Activities" = activities, "Results" = results)
             assign("list_of_datasets", list_of_datasets, envir = globalenv())
