@@ -103,6 +103,8 @@ buildBioMonTools <- function(connection, write){
             real[27] <- NA # "SCC" 
             real[28] <- NA # "HYBRID" 
             
+            real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            
             # error-checking:
             check_df <- tibble::tibble(data.frame(matrix(ncol=3, nrow=ncol(real))))
             colnames(check_df) <- c("real", "example", "result")
