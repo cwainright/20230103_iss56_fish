@@ -31,7 +31,7 @@ db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Strea
 # db <- file.choose()
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
 buildEDD(connection = con, write = TRUE)
-buildBioMonTools(connection = con, write = TRUE)
+buildBioMonTools(connection = con, write = FALSE)
 buildMarcView(connection = con, write = TRUE)
 
 RODBC::odbcCloseAll() # close db connection
