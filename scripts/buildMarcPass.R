@@ -151,28 +151,36 @@ buildMarcPass <- function(connection, add2022){
             pass[23] <- df$Loc_Name # "Branch"
             pass[24] <- df$PARKNAME # "Reach_Name"
             pass[25] <- df$Anom # "Delt_deformities" 
-            pass[26] <- as.character(pass[26])
+            pass[25] <- as.character(pass$Delt_deformities) # "Delt_deformities" 
+            # pass[25] <- as.character(pass[25])
             for(i in 1:nrow(pass)){
-                if(pass[i,26] == "0"){
-                    pass[i,26] <- "DELT reported for this pass"
+                if(pass[i,25] != "0"){
+                    pass[i,25] <- "DELT reported for this pass"
                 } else {
-                    pass[i,26] <- "No DELT"
+                    pass[i,25] <- "No DELT"
                 }
             }    
             pass[26] <- NA #"Delt_erodedfins" 
             pass[27] <- NA # "Delt_lesions" 
             pass[28] <- NA # "Delt_tumors" 
-            pass[29] <- paste0("DELT description: ", df$Comments_fishdata) # "Delt_other" 
+            for(i in 1:nrow(pass)){
+                if(pass[i,25] == "No DELT"){
+                    pass[i,29] <- NA
+                } else {
+                    pass[i,29] <- df$Comments_fishdata[i] # "Delt_other"
+                }
+            }
+            # pass[29] <- paste0("DELT description: ", df$Comments_fishdata) # "Delt_other" 
                 
 
                 
             # error-checking:
-            check_df <- tibble::tibble(data.frame(matrix(ncol=3, nrow=ncol(pass_marc))))
-            colnames(check_df) <- c("pass_marc", "example", "result")
-            check_df$pass_marc <- colnames(pass_marc)
+            check_df <- tibble::tibble(data.frame(matrix(ncol=3, nrow=ncol(pass))))
+            colnames(check_df) <- c("pass", "example", "result")
+            check_df$pass <- colnames(pass)
             check_df$example <- colnames(example)
             for(i in 1:nrow(check_df)){
-                if(check_df$pass_marc[i] == check_df$example[i]){
+                if(check_df$pass[i] == check_df$example[i]){
                     check_df$result[i] <- "MATCH"
                 } else {
                     check_df$result[i] <- "MISMATCH"
