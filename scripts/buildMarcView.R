@@ -8,7 +8,7 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildMarc <- function(connection, write){
+buildMarc <- function(connection, write, addMarc){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -19,8 +19,8 @@ buildMarc <- function(connection, write){
             source("scripts/buildMarcPass.R")
             source("scripts/buildMarcIndiv.R")
             
-            pass <- buildMarcPass(connection = con, add2022 = add2022)
-            indiv <- buildMarcIndiv(connection = con)
+            pass <- buildMarcPass(connection = con, addMarc = addMarc)
+            indiv <- buildMarcIndiv(connection = con, addMarc = addMarc)
             
             list_of_datasets <- list("by_pass" = pass, "individuals" = indiv)
             assign("marc_views", list_of_datasets, envir = globalenv())

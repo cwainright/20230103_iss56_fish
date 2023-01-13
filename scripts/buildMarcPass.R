@@ -4,7 +4,7 @@
 #--------------------------------------------------------------------------
 # a module for `scripts/buildMarcView.R`
 
-buildMarcPass <- function(connection, add2022){
+buildMarcPass <- function(connection, addMarc){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -15,8 +15,9 @@ buildMarcPass <- function(connection, add2022){
             #----- load project functions
             source("scripts/getQueryResults.R") # equivalent to python "from x import function"
             source("scripts/buildMarc2022Pass.R") # equivalent to python "from x import function"
+            source("scripts/buildGameFishPass.R") # equivalent to python "from x import function"
             # load example data
-            example <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "data_model_pass") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx?d=w306357b1a43a48f4b9f598169043cc6a&csf=1&web=1&e=BC5i5n
+            example <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "data_model") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx?d=w306357b1a43a48f4b9f598169043cc6a&csf=1&web=1&e=BC5i5n
             marc2021 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2021_Marc.xlsx", sheet = "Fish Data (Individuals)")
             marc2022 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData")
             
@@ -68,7 +69,7 @@ buildMarcPass <- function(connection, add2022){
             df <- results_list$tbl_Fish_Data
             df <- rename(df, Comments_fishdata = Comments)
             df <- dplyr::left_join(df, results_list$tlu_Fish %>% select(Latin_Name, Common_Name, Nativity, Tolerance, `Trophic Status`), by = c("Fish_Species" = "Latin_Name"))
-            df$total_n <- sum(df$Total_Pass_1, df$Total_Pass_2)
+            df$total_n <- df$Total_Pass_1 + df$Total_Pass_2
             df <- dplyr::left_join(df, results_list$tbl_Fish_Events %>% select(Fish_Event_ID, Event_ID, Seg_Length, Fish_Biomass_1, Fish_Biomass_2), by = "Fish_Event_ID")
             df <- dplyr::left_join(df, results_list$tbl_Events %>% select(Event_ID, Location_ID, Start_Date, Start_Time, Comments), by = "Event_ID")
             df <- rename(df, Comments_tblevents = Comments)
@@ -172,7 +173,7 @@ buildMarcPass <- function(connection, add2022){
                     pass[i,30] <- df$Comments_fishdata[i] # "Delt_other"
                 }
             }
-            pass[31] <- 'NCRN MBSS Access db: "~Documents - NPS-NCRN-Biological Stream Sampling\General\Annual-Data-Packages\2022\NCRN_MBSS\NCRN_MBSS_be_2022.mdb"'
+            pass[31] <- 'NCRN MBSS Access db: tbl_Fish_Data, "~Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb"'
             pass <- unique(setDT(pass), by=c("FishObsID")) 
 
                 
@@ -188,10 +189,17 @@ buildMarcPass <- function(connection, add2022){
                     check_df$result[i] <- "MISMATCH"
                 }
             }
+            
+            #-------------------------------------------------
+            #----- Add pre-2020 gamefish data to pass format--
+            #-------------------------------------------------
+            gamefish_pass <- buildGameFishPass()
+            pass <- rbind(pass, gamefish_pass)
+            
             #--------------------------------------------
-            #----- Add Marc's 2022 data to indiv format--
+            #----- Add Marc's 2022 data to pass format--
             #--------------------------------------------
-            if(add2022 == TRUE){
+            if(addMarc == TRUE){
                 pass2022 <- buildMarc2022Pass()
                 pass <- rbind(pass, pass2022)
             }
