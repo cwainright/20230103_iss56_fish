@@ -16,12 +16,13 @@ buildMarcPass <- function(connection, add2022){
             source("scripts/getQueryResults.R") # equivalent to python "from x import function"
             source("scripts/buildMarc2022Pass.R") # equivalent to python "from x import function"
             # load example data
-            example <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "data_model") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx?d=w306357b1a43a48f4b9f598169043cc6a&csf=1&web=1&e=BC5i5n
+            example <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "data_model_pass") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx?d=w306357b1a43a48f4b9f598169043cc6a&csf=1&web=1&e=BC5i5n
             marc2021 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2021_Marc.xlsx", sheet = "Fish Data (Individuals)")
             marc2022 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData")
             
-            marc2022 <- rename(marc2022, common_name = `Species_ID...12`)
-            marc2022 <- rename(marc2022, species_id = `Species_ID...13`)
+            data.table::setnames(marc2022, "Species_ID...12", "common_name")
+            data.table::setnames(marc2022, "Species_ID...13", "species_id")
+            
             # Query db
             db_objs <- RODBC::sqlTables(con) # test db connection
             tbl_names <- db_objs %>% # choose which tables you want to query
@@ -62,8 +63,8 @@ buildMarcPass <- function(connection, add2022){
             #----- One row is one e-fishing pass---------------------------------------
             #--------------------------------------------------------------------------
             
-            # make a flat dataframe where one row is one e-fishing pass from `results_list`
-            # this will have data that matches Marc's 2022 format: readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData")
+            # make a flat dataframe where one row is one unique combination of `pass` and `species` from `results_list`
+            
             df <- results_list$tbl_Fish_Data
             df <- rename(df, Comments_fishdata = Comments)
             df <- dplyr::left_join(df, results_list$tlu_Fish %>% select(Latin_Name, Common_Name, Nativity, Tolerance, `Trophic Status`), by = c("Fish_Species" = "Latin_Name"))
@@ -108,20 +109,21 @@ buildMarcPass <- function(connection, add2022){
             
             pass[1] <- df$id # "FishObsID"
             pass[2] <- format(df$Start_Date, "%Y")# "Year"
-            pass[3] <- format(df$Start_Date, "%Y-%m-%d") # "SampleDate"
+            pass[3] <- as.character(format(df$Start_Date, "%Y-%m-%d")) # "SampleDate"
             pass[4] <- format(df$Start_Time, "%H:%M") # "SampleTime"
             pass[5] <- df$Site_ID # "Station_ID"
             pass[6] <- df$NCRN_Site_ID # "Station_Name"
             pass[7] <- paste0(format(df$Start_Date, "%Y-%m-%d"), "_", format(df$Start_Time, "%H:%M"), "_", df$pass) # "Pass_ID"
-            pass[8] <- format(df$Entered_Date, "%Y-%m-%d") # "Entry_Date"
-            pass[9] <- format(df$Entered_Date, "%H:%M") # "Entry_Time"
+            pass[8] <- as.character(format(df$Entered_Date, "%Y-%m-%d")) # "Entry_Date"
+            pass[9] <- as.character(format(df$Entered_Date, "%H:%M")) # "Entry_Time"
             pass[10] <- trimws(tolower(df$Common_Name)) # "Subject_Taxon"
             # "Species_ID"
             pass <- dplyr::left_join(pass, tlu_species, by=c("Subject_Taxon" = "common_name"))
             pass[11] <- pass$species_id # "Species_ID"
             pass$species_id <- NULL # delete the joined column
-            pass[12] <- NA # "Status"
-            pass[13] <- df$retained # "Disposition"
+            pass[12] <- df$value # "Count"
+            pass[13] <- NA # "Status"
+            pass[14] <- df$retained # "Disposition"
             for(i in 1:nrow(pass)){
                 if(pass$Disposition[i] >0){
                     pass$Disposition[i] <- paste0("Retained ", pass$Disposition[i], " individuals")
@@ -129,49 +131,49 @@ buildMarcPass <- function(connection, add2022){
                     pass$Disposition[i] <- "Released"
                 }
             }
-            pass[14] <- df$Photo_num # "Picture"
-            pass[15] <- NA # "Camera" 
+            pass[15] <- df$Photo_num # "Picture"
+            pass[16] <- NA # "Camera" 
             # "Photo"
             # the value of $Photo should be TRUE or FALSE
             # depending on whether there is a picture
             # in our access db, there's a picture if there's a value in $Photo_num
             for(i in 1:nrow(pass)){
                 if(is.na(pass$Picture[i])){
-                    pass[i,16] <- FALSE
+                    pass[i,17] <- FALSE
                 } else {
-                    pass[i,16] <- TRUE
+                    pass[i,17] <- TRUE
                 }
             }
-            pass[17] <- NA # "TL_mm" NA because `pass` aggregates to e-fishing pass (refer to `indiv` for $TL_mm data)
-            pass[18] <- NA # "Wt_g" NA because `pass` aggregates to e-fishing pass (refer to `indiv` for $Wt_g data)
-            pass[19] <- NA # "Calc_wt_TL_g" NA because `pass` aggregates to e-fishing pass (refer to `indiv` for $Calc_wt_TL_g data)
-            pass[20] <- NA # "Wt_AddedOn"
-            pass[21] <- df$Comments_tblevents # "Note"
-            pass[22] <- df$Basin# "Basin"
-            pass[23] <- df$Loc_Name # "Branch"
-            pass[24] <- df$PARKNAME # "Reach_Name"
-            pass[25] <- df$Anom # "Delt_deformities" 
-            pass[25] <- as.character(pass$Delt_deformities) # "Delt_deformities" 
+            pass[18] <- NA # "TL_mm" NA because `pass` aggregates to e-fishing pass (refer to `indiv` for $TL_mm data)
+            pass[19] <- NA # "Wt_g" NA because `pass` aggregates to e-fishing pass (refer to `indiv` for $Wt_g data)
+            pass[20] <- NA # "Calc_wt_TL_g" NA because `pass` aggregates to e-fishing pass (refer to `indiv` for $Calc_wt_TL_g data)
+            pass[21] <- NA # "Wt_AddedOn"
+            pass[22] <- df$Comments_tblevents # "Note"
+            pass[23] <- df$Basin# "Basin"
+            pass[24] <- df$Loc_Name # "Branch"
+            pass[25] <- df$PARKNAME # "Reach_Name"
+            pass[26] <- df$Anom # "Delt_deformities" 
+            pass[26] <- as.character(pass$Delt_deformities) # "Delt_deformities" 
             # pass[25] <- as.character(pass[25])
             for(i in 1:nrow(pass)){
-                if(pass[i,25] != "0"){
-                    pass[i,25] <- "DELT reported for this pass"
+                if(pass[i,26] != "0"){
+                    pass[i,26] <- "DELT reported for this pass"
                 } else {
-                    pass[i,25] <- "No DELT"
+                    pass[i,26] <- "No DELT"
                 }
             }    
-            pass[26] <- NA #"Delt_erodedfins" 
-            pass[27] <- NA # "Delt_lesions" 
-            pass[28] <- NA # "Delt_tumors" 
+            pass[27] <- NA #"Delt_erodedfins" 
+            pass[28] <- NA # "Delt_lesions" 
+            pass[29] <- NA # "Delt_tumors" 
             for(i in 1:nrow(pass)){
-                if(pass[i,25] == "No DELT"){
-                    pass[i,29] <- NA
+                if(pass[i,26] == "No DELT"){
+                    pass[i,30] <- NA
                 } else {
-                    pass[i,29] <- df$Comments_fishdata[i] # "Delt_other"
+                    pass[i,30] <- df$Comments_fishdata[i] # "Delt_other"
                 }
             }
-            # pass[29] <- paste0("DELT description: ", df$Comments_fishdata) # "Delt_other" 
-                
+            pass[31] <- 'NCRN MBSS Access db: "~Documents - NPS-NCRN-Biological Stream Sampling\General\Annual-Data-Packages\2022\NCRN_MBSS\NCRN_MBSS_be_2022.mdb"'
+            pass <- unique(setDT(pass), by=c("FishObsID")) 
 
                 
             # error-checking:

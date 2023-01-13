@@ -19,7 +19,7 @@ buildMarc <- function(connection, write){
             source("scripts/buildMarcPass.R")
             source("scripts/buildMarcIndiv.R")
             
-            pass <- buildMarcPass(connection = con)
+            pass <- buildMarcPass(connection = con, add2022 = add2022)
             indiv <- buildMarcIndiv(connection = con)
             
             list_of_datasets <- list("by_pass" = pass, "individuals" = indiv)
