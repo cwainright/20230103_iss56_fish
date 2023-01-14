@@ -39,9 +39,6 @@ library(RODBC)
 library(openxlsx)
 
 #----- load project functions
-# source("scripts/buildRealLocations.R")
-# source("scripts/buildRealActivities.R")
-# source("scripts/buildRealResults.R")
 source("scripts/buildEDD.R")
 source("scripts/buildBioMonTools.R")
 source("scripts/buildMarcView.R")
