@@ -47,8 +47,8 @@ source("scripts/buildMarcView.R")
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 # db <- file.choose()
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
-buildEDD(connection = con, write = FALSE)
-buildBioMonTools(connection = con, write = FALSE)
-buildMarc(connection = con, write = FALSE, addMarc = TRUE)
+# buildEDD(connection = con, write = FALSE)
+# buildBioMonTools(connection = con, write = FALSE)
+buildMarc(connection = con, write = TRUE, addMarc = TRUE)
 
 RODBC::odbcCloseAll() # close db connection
