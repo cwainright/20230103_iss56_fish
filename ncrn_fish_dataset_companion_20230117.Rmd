@@ -1,0 +1,111 @@
+---
+title: "NCRN Fish data companion"
+date: "17 Jan 2023"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r, include=FALSE, warning=FALSE}
+library(knitr)
+library(data.table)
+library(tidyverse)
+library(dplyr)
+```
+
+## Overview
+
+The file `ncrn_cumulative_fish_data_20230117.xlsx` is an Excel workbook (hereafter "workbook") containing the cumulative fish data (hereafter "dataset") collected by USNPS National Capital Region Network (NCRN). This markdown document explains the contents of the workbook, the data model used to arrange the dataset, and provides general guidelines for interpreting the dataset.
+
+Data are presented in two views (`by_pass` and `individuals`) because NCRN only collected individual-level data (e.g., total length) for 'gamefish' (e.g., trout and bass species) pre-2019. Non-gamefishes data were aggregated to a count of `individuals` per electrofishing run, making it impossible to provide individual-level data for all legacy NCRN electrofishing surveys. **NOTE:** This limitation means that data provided in `individuals` is provided in `by_pass`, but the reverse is not always true.
+
+## Methods
+
+### Two-pass electrofishing
+
+NCRN uses two-pass backpack electrofishing for stream fish surveys. The protocol for stream fish surveys is [available here.](https://doimspp.sharepoint.com/:b:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Operational%20Reviews/NCRN_Biological_Stream_Survey_Protocol_Ver_2.0_NRR.pdf?csf=1&web=1&e=jaH7W0)
+
+### Data model and metadata
+
+The data model in the workbook is a mix of the [electronic data deliverable (EDD)](https://www.epa.gov/sites/default/files/2016-01/documents/r2comprehensivemanual_sept2015.pdf) format and the data model provided by Marc Peipoch. **The data model is identical in both tabs of the workbook.** The difference between the two views is the level of aggregation. Table 1 provides an example and an explanation of each column in the workbook.
+
+### Two views of NCRN fish data
+
+1.  `by_pass` is a summary containing a count of individual fishes of a species captured in an electrofishing event. One row in `by_pass` is a unique combination of electrofishing event and species. You can create a logical key for `by_pass` by concatenating `FishObsID` and `Pass_ID`.
+2.  `individuals` contains data about individual fishes captured during electofishing. One row in `individuals` is one individual fish. `FishObsID` is the key field for `individuals`.
+
+
+```{r, echo=FALSE, include=FALSE, warning=FALSE}
+#----- load external libraries
+library(data.table)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(RODBC)
+library(openxlsx)
+library(kableExtra)
+
+#----- load project functions
+# source("scripts/buildEDD.R")
+# source("scripts/buildBioMonTools.R")
+source("scripts/buildMarcView.R")
+
+# Connect to db
+db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
+# db <- file.choose()
+con <- RODBC::odbcConnectAccess2007(db) # open db connection
+# buildEDD(connection = con, write = FALSE)
+# buildBioMonTools(connection = con, write = FALSE)
+buildMarc(connection = con, write = FALSE, addMarc = TRUE)
+```
+### Table 1.
+Dataset metadata explanation for cumulative NCRN fish data.
+
+
+```{r, echo=FALSE, warning=FALSE}
+# kable(data.table::melt(head(marc_views$by_pass, 1), id.vars = c("colname", "example")))
+df <- data.frame(example_data = t(head(marc_views$by_pass, 1))) # transpose
+for(i in 1:nrow(df)){ # assign each rowname as the `col_name`
+    df$col_name[i] <- rownames(df)[i]
+}
+rownames(df) <- seq(1,nrow(df),1) # reset the rownames so kable will ignore them
+df <- df %>% select(`col_name`, `example_data`)
+# # df$explanation <- NA
+df$explanation <- c("`FishObsID` str, required; a row ID that can be used to cross-reference between datasets `by_pass` and `individuals`. In this example, '0070D8CD-AF51-4580-A6D7-3A015A555D1C' is the `tbl_Fish_Data.Data_ID` assigned to the electrofishing event in the NCRN fish database. `FishObsID` is the key field in `individuals` and a foreign key in `by_pass`. ",
+                    "`Year` str; datetime field formatted as a 4-digit year, YYYY; `tbl_Events.Start_Date`",
+                    "`SampleDate` str; datetime field formatted in year-month-date format, YYYY-MM-DD; `tbl_Events.Start_Date`",
+                    "`SampleTime` str; datetime field formatted in time format, HH:MM; `tbl_Events.Start_Date`",
+                    "`Station_ID` str; sampling location ID; `tbl_Locations.Site_ID`",
+                    "`Station_Name` str; sampling location name; tbl_Locations.Site_ID.NCRN_Site_ID",
+                    "`Pass_ID` str; electrofishing pass ID; concatenation of `SampleDate`, `SampleTime`, and pass number.",
+                    "`Entry_Date` str; datetime when the record was entered into the database (either NCRN's fish database or Marc's database); formatted as YYYY-MM-DD; `tbl_Meta_Events.Entered_Date`",
+                    "`Entry_Time` str; datetime when the record was entered into the database (either NCRN's fish database or Marc's database); HH:MM; `tbl_Meta_Events.Entered_Date`",
+                    "`Subject_Taxon` str; the fish species common name; `tlu_Fish.Common_Name`",
+                    "`Scientific_Name` str; the fish species latin name; `tlu_Fish.Latin_Name`",
+                    "`Species_ID` str; the fish species ID code derived from Marc 2021 and 2022 data",
+                    "`Count` int; the count of individual fishes captured; for nongame fishes either tbl_Fish_Data.Total_Pass_1 or tbl_Fish_Data.Total_Pass_2; for gamefishes `Count` was always 1 in NCRN records",
+                    "`Status` str; unclear if this the fish's status at time of capture or after processing: choices are 'Live' or 'Dead'. NCRN does not track this datum.",
+                    "`Disposition` str; documentation of whether the fish(es) were released or not after processing: choices are 'Release' or 'Retained'; `tbl_Fish_Data.retained`",
+                    "`Picture` str; if a picture (i.e., photo) was associated with this sample, its picture ID is provided in `Picture`. The picture at this ID may or may not be a picture of the fish and it could simply be a picture associated with the sample (e.g., a picture showing habitat conditions). `tbl_Photos.Photo_Num`",
+                    "`Camera` str; the model of camera used to take a photo. NCRN does not track this datum.",
+                    "`Photo` bool; TRUE or FALSE. TRUE indicates that there is a picture associated with this record.",
+                    "`TL_mm` num; the total length in millimeters of a captured fish. Always NA in `by_pass` because total length is an individual-level datum.",
+                    "`Wt_g` num; the weight (mass) in grams of a captured fish. Always NA in `by_pass` because total length is an individual-level datum.",
+                    "`Calc_wt_TL_g` num; possibly a calculated value based on a length-weight relationship. NCRN does not track this datum.",
+                    "`Wt_AddedOn` date; possibly a datetime associated with `Calc_wt_TL_g`. NCRN does not track this datum.",
+                    "`Note` str; comments associated with the sampling event, not necessarily the fish(es). `tbl_Events.Comments`",
+                    "`Basin` str; a geographic area (usually the name of a watershed or similar) in which the sampling location is found. `tlu_Basin_Code.Basin`",
+                    "`Branch` str; the creek name where the sampling occurred. `tbl_Locations.Loc_Name`",
+                    "`Reach_Name` str; the Park where sampling occurred. `tlu_Park_Code.PARKNAME`",
+                    "`Delt_deformities` bool; TRUE or FALSE. True indiciates that DELT deformities were reported for this record. tbl_Fish_Data.Anom",
+                    "`Delt_erodedfins` bool; TRUE or FALSE. True indiciates that DELT eroded fins deformities were reported for this record. NCRN only tracks DELT in comments `Delt_other`.",
+                    "`Delt_lesions` bool; TRUE or FALSE. True indiciates that DELT lesions deformities were reported for this record. NCRN only tracks DELT in comments `Delt_other`.",
+                    "`Delt_tumors` bool; TRUE or FALSE. True indiciates that DELT tumors deformities were reported for this record. NCRN only tracks DELT in comments `Delt_other`.",
+                    "`Delt_other` str; comments associated with a species captured during electrofishing. NCRN does not specifically capture DELT comments but these comments tend to be about the condition of captured fishes. `tbl_Fish_Data.Comments`",
+                    "`Source` str; the source (database or spreadsheet) of the data in a record."
+                    )
+
+kable(df,
+      col.names=c("Column name", "Example data", "Explanation"))%>%
+  kable_styling("striped")
+```
