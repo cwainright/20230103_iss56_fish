@@ -91,16 +91,16 @@ buildMarcPass <- function(addMarc, example, marc2021, marc2022, tlu_species, res
             # pass[25] <- as.character(pass[25])
             for(i in 1:nrow(pass)){
                 if(pass[i,27] != "0"){
-                    pass[i,27] <- "DELT reported for this pass"
+                    pass[i,27] <- "TRUE"
                 } else {
-                    pass[i,27] <- "No DELT"
+                    pass[i,27] <- "FALSE"
                 }
             }    
             pass[28] <- NA #"Delt_erodedfins" 
             pass[29] <- NA # "Delt_lesions" 
             pass[30] <- NA # "Delt_tumors" 
             for(i in 1:nrow(pass)){
-                if(pass[i,27] == "No DELT"){
+                if(pass[i,27] == "FALSE"){
                     pass[i,31] <- NA
                 } else {
                     pass[i,31] <- df$Comments_fishdata[i] # "Delt_other"
@@ -148,6 +148,8 @@ buildMarcPass <- function(addMarc, example, marc2021, marc2022, tlu_species, res
                     }
                 }
             )
+            pass$TL_mm <- NA # total length should always be NA for pass-level data because TL is an individual-level metric
+            pass$Wt_g <- NA # weight should always be NA for pass-level data because TL is an individual-level metric
             # assign("pass_marc", pass_marc, envir = globalenv())
 
             return(pass)

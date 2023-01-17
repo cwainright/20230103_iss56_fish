@@ -62,13 +62,13 @@ buildMarc2022Pass <- function(marc2022, example, tlu_species, results_list){
             pass2022[25] <- df$Branch # "Branch" 
             pass2022[26] <- df$Reach_Name # "Reach_Name" 
             pass2022[27] <- as.character(df$Delt_deformities) # "Delt_deformities" 
-            for(i in 1:nrow(pass2022)){
-                if(pass2022[i,27] == "FALSE"){
-                    pass2022[i,27] <- "No DELT"
-                } else {
-                    pass2022[i,27] <- "DELT reported for this pass"
-                }
-            }
+            # for(i in 1:nrow(pass2022)){
+            #     if(pass2022[i,27] == "FALSE"){
+            #         pass2022[i,27] <- "No DELT"
+            #     } else {
+            #         pass2022[i,27] <- "DELT reported for this pass"
+            #     }
+            # }
             pass2022[28] <- NA #"Delt_erodedfins" 
             pass2022[29] <- NA # "Delt_lesions" 
             pass2022[30] <- NA # "Delt_tumors" 
@@ -94,7 +94,7 @@ buildMarc2022Pass <- function(marc2022, example, tlu_species, results_list){
                 } 
             }
             for(i in 1:nrow(pass2022)){
-                if(pass2022[i,27] == "No DELT"){
+                if(pass2022[i,27] == "FALSE"){
                     pass2022[i,31] <- NA
                 } else {
                     pass2022[i,31] <- df$deltconcat[i]
