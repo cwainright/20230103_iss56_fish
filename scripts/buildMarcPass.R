@@ -31,6 +31,7 @@ buildMarcPass <- function(addMarc, example, marc2021, marc2022, tlu_species, res
             df <- data.table::melt(setDT(df), measure.vars = c("Total_Pass_1","Total_Pass_2"), id.vars = keepcols, variable.name = "pass")
             df$pass <- stringr::str_extract(df$pass, "[A-Za-z]+_[0-9]+") # regex extracts only Pass_x
             df$pass <- gsub("_", "", df$pass) # gsub replaces underscore "_" with nothing ""
+            # df$id2 <- df$Data_ID
             df$id <- paste0(df$Data_ID, "_", df$pass)
             # RODBC::odbcCloseAll() # close db connection
             
@@ -38,7 +39,7 @@ buildMarcPass <- function(addMarc, example, marc2021, marc2022, tlu_species, res
             pass <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(df)))) # empty dataframe
             colnames(pass) <- colnames(example) # name columns to match example
             
-            pass[1] <- df$id # "FishObsID"
+            pass[1] <- df$Data_ID # "FishObsID"
             pass[2] <- format(df$Start_Date, "%Y")# "Year"
             pass[3] <- as.character(format(df$Start_Date, "%Y-%m-%d")) # "SampleDate"
             pass[4] <- format(df$Start_Time, "%H:%M") # "SampleTime"
@@ -106,7 +107,9 @@ buildMarcPass <- function(addMarc, example, marc2021, marc2022, tlu_species, res
                 }
             }
             pass[32] <- 'NCRN MBSS Access db: tbl_Fish_Data, "~Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb"'
-            pass <- unique(setDT(pass), by=c("FishObsID")) 
+            pass$id <- df$id
+            pass <- unique(setDT(pass), by=c("id")) 
+            pass$id <- NULL
 
                 
             # error-checking:
