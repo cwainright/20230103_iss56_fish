@@ -37,7 +37,38 @@ buildMarc <- function(connection, write, addMarc){
                 }
             }
             marc2022$common_name <- tolower(marc2022$common_name)
-            results_list <- getQueryResults(connection = con) # query the db
+            
+            
+            #----- static assets for query
+            # Query db
+            db_objs <- RODBC::sqlTables(con) # test db connection
+            tbl_names <- db_objs %>% # choose which tables you want to query
+                subset(TABLE_NAME %in% c(
+                    "tbl_Events",
+                    "tbl_Protocol",
+                    "tbl_Fish_Events",
+                    "tbl_Locations",
+                    "tbl_Meta_Events",
+                    "tbl_Fish_Data",
+                    "tbl_GameFish",
+                    "tlu_Fish",
+                    "tlu_Collection_Procedures_Gear_Config",
+                    "tbl_Electro_Fish_Details",
+                    "tlu_Basin_Code",
+                    "tbl_Photos",
+                    "tlu_Park_Code"
+                )
+                ) %>%
+                select(TABLE_NAME)
+            
+            # make list of queries
+            qry_list <- vector(mode="list", length=nrow(tbl_names))
+            names(qry_list) <- tbl_names$TABLE_NAME
+            for (i in 1:length(qry_list)){
+                qry_list[[i]] <- paste("SELECT * FROM", names(qry_list)[i])
+            }
+            
+            results_list <- getQueryResults(qry_list = qry_list, connection = con) # execute query
             RODBC::odbcCloseAll() # close db connection
             tlu_species <- buildLookup(marc2022 = marc2022, results_list = results_list)
             
