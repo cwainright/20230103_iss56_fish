@@ -14,9 +14,9 @@ buildMarc <- function(connection, write, addMarc){
             suppressWarnings(suppressMessages(library(dplyr)))
             
             #----- load project functions
-            source("scripts/buildMarcPass.R")
-            source("scripts/buildMarcIndiv.R")
-            source("scripts/buildLookup.R")
+            source("scripts/marc/buildMarcPass.R")
+            source("scripts/marc/buildMarcIndiv.R")
+            source("scripts/marc/buildLookup.R")
             source("scripts/getQueryResults.R") # equivalent to python "from x import function"
 
             #----- pre-process and cache assets for functions

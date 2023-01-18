@@ -8,8 +8,8 @@ buildMarcPass <- function(addMarc, example, marc2021, marc2022, tlu_species, res
     tryCatch(
         expr = {
             #----- load project functions
-            source("scripts/buildMarc2022Pass.R") # equivalent to python "from x import function"
-            source("scripts/buildGameFishPass.R") # equivalent to python "from x import function"
+            source("scripts/marc/buildMarc2022Pass.R") # equivalent to python "from x import function"
+            source("scripts/marc/buildGameFishPass.R") # equivalent to python "from x import function"
 
             #----- make a flat dataframe where one row is one unique combination of `pass` and `species` from `results_list`
             df <- results_list$tbl_Fish_Data
