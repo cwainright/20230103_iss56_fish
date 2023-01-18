@@ -1,7 +1,6 @@
-# build example
-# a module for `scripts/fish_data_view.R`
+# a module for `buildEDD()`
 
-buildEDDActivities <- function(results_list){
+getEDDActivities <- function(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -9,6 +8,10 @@ buildEDDActivities <- function(results_list){
             suppressWarnings(suppressMessages(library(tidyverse)))
             suppressWarnings(suppressMessages(library(dplyr)))
             suppressWarnings(suppressMessages(library(readxl)))
+            
+            #----- load project functions
+            source("scripts/edd/getMarc2022Activities.R")
+            source("scripts/edd/getMarcHabActivities.R")
             
             # load example data
             example <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Activities") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNDataManagement/Shared%20Documents/General/Standards/Data-Standards/EQuIS-WQX-EDD/NCRN_BSS_EDD_20230105_1300.xlsx?d=w8c283fde9cbd4af480945c8c8bd94ff6&csf=1&web=1&e=7Y9W1M
@@ -21,8 +24,6 @@ buildEDDActivities <- function(results_list){
             df <- dplyr::left_join(df, results_list$tbl_Locations %>% select(Location_ID, Loc_Name, NCRN_Site_ID), by = "Location_ID")
             df2 <- results_list$tbl_Electro_Fish_Details %>% dplyr::distinct(Fish_Event_ID, .keep_all = TRUE)
             df <- dplyr::left_join(df, df2 %>% select(Fish_Event_ID, Pass_1_Start, Pass_1_End, Pass_2_Start, Pass_2_End), by = "Fish_Event_ID")
-            
-            
             
             #----- re-build `example` from `results_list`
             
@@ -38,7 +39,7 @@ buildEDDActivities <- function(results_list){
             real[6] <- "Water" # "Medium"  choices are "Water", "Air", and "Other" in `example`
             real[7] <- NA # "Medium_Subdivision"
             real[8] <- "Stream Fish" # "Assemblage_Sampled_Name"
-            real[9] <- df$Start_Date # "Activity_Start_Date"
+            real[9] <- format(df$SampleDate, "%Y-%m-%d") # "Activity_Start_Date"
             real[10] <- format(df$Start_Time, "%H:%M") # "Activity_Start_Time" 
             real[11] <- "Eastern Time - Washington, DC" # "Activity_Start_Time_Zone" 
             real[12] <- NA # "Activity_End_Date" 
@@ -147,6 +148,14 @@ buildEDDActivities <- function(results_list){
                 }
             }
             real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            colnames(real)[1] <- "#Org_Code"
+            
+            #----- if TRUE add Marc's 2022 data to dataframe `real` NCRN db data
+            if(addMarc==TRUE){
+                marc2022_activities <- getMarc2022Activities(marc2022, example) # NCRN already has Marc's 2021 activities in db, so only add 2022
+                marc_habitat_activities <- getMarcHabActivities(habitat_marc2022, habitat_marc2021, example, results_list) # NCRN doesn't have any of Marc's habitat data, so add both 2021 and 2022
+                real <- rbind(real, marc2022_activities, marc_habitat_activities)
+            }
             
             # test <- cbind(real_activities[62:63], df$Pass_1_End, df$Pass_1_Start, df$Pass_2_End, df$Pass_2_Start) # check the `$Effort` math in real[62]
             # assign("activities", real, envir = globalenv())

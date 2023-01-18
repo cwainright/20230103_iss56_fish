@@ -1,7 +1,6 @@
-# build example
-# a module for `scripts/fish_data_view.R`
+# a module for `buildEDD()`
 
-buildEDDLocations <- function(results_list){
+getEDDLocations <- function(results_list, marc2022, marc2021, addMarc){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -9,6 +8,9 @@ buildEDDLocations <- function(results_list){
             suppressWarnings(suppressMessages(library(tidyverse)))
             suppressWarnings(suppressMessages(library(dplyr)))
             suppressWarnings(suppressMessages(library(readxl)))
+            
+            #----- load project functions
+            source("scripts/edd/getMarc2022Locations.R")
             
             #----- load project functions
             # source("scripts/getQueryResults.R") # equivalent to python "from x import function"
@@ -104,9 +106,13 @@ buildEDDLocations <- function(results_list){
             real[42] <- NA # "Well_Status"
 
             real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            colnames(real)[1] <- "#Org_Code"
             
-            # assign("locations", real, envir = globalenv())
-            # assign("example", example, envir = globalenv())
+            #----- if TRUE add Marc's 2022 data to dataframe `real` NCRN db data
+            if(addMarc==TRUE){
+                marc2022_locations <- getMarc2022Locations(marc2022, example)
+                real <- rbind(real, marc2022_locations)
+            }
             
             # error-checking:
             check_df <- tibble::tibble(data.frame(matrix(ncol=3, nrow=ncol(real))))
