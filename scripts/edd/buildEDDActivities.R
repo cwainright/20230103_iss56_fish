@@ -1,7 +1,7 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildEDDActivities <- function(connection){
+buildEDDActivities <- function(results_list){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -10,39 +10,8 @@ buildEDDActivities <- function(connection){
             suppressWarnings(suppressMessages(library(dplyr)))
             suppressWarnings(suppressMessages(library(readxl)))
             
-            #----- load project functions
-            source("scripts/getQueryResults.R") # equivalent to python "from x import function"
             # load example data
             example <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Activities") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNDataManagement/Shared%20Documents/General/Standards/Data-Standards/EQuIS-WQX-EDD/NCRN_BSS_EDD_20230105_1300.xlsx?d=w8c283fde9cbd4af480945c8c8bd94ff6&csf=1&web=1&e=7Y9W1M
-            
-            # Query db
-            db_objs <- RODBC::sqlTables(con) # test db connection
-            tbl_names <- db_objs %>% # choose which tables you want to query
-                subset(TABLE_NAME %in% c(
-                    "tbl_Events",
-                    "tbl_Protocol",
-                    "tbl_Fish_Events",
-                    "tbl_Locations",
-                    "tbl_Meta_Events",
-                    "tlu_Collection_Procedures_Gear_Config",
-                    "tbl_Electro_Fish_Details"
-                    )
-                    ) %>%
-                select(TABLE_NAME)
-            
-            # make list of queries so we can extract a few rows from each table
-            qry_list <- vector(mode="list", length=nrow(tbl_names))
-            names(qry_list) <- tbl_names$TABLE_NAME
-            for (i in 1:length(qry_list)){
-                qry_list[[i]] <- paste("SELECT * FROM", names(qry_list)[i])
-            }
-                
-            results_list <- getQueryResults(qryList = qry_list, connection = con)
-            
-            # tidy up
-            rm(db_objs)
-            rm(tbl_names)
-            rm(qry_list)
             
             # make a flat dataframe from `results_list`
             df <- results_list$tbl_Fish_Events %>% select(-c(Fish_Move, Bottom_Visible, Water_Quality_2, Fish_Biomass_1, Fish_Biomass_2))
@@ -53,7 +22,7 @@ buildEDDActivities <- function(connection){
             df2 <- results_list$tbl_Electro_Fish_Details %>% dplyr::distinct(Fish_Event_ID, .keep_all = TRUE)
             df <- dplyr::left_join(df, df2 %>% select(Fish_Event_ID, Pass_1_Start, Pass_1_End, Pass_2_Start, Pass_2_End), by = "Fish_Event_ID")
             
-            # RODBC::odbcCloseAll() # close db connection
+            
             
             #----- re-build `example` from `results_list`
             

@@ -1,7 +1,7 @@
 # build example
 # a module for `scripts/fish_data_view.R`
 
-buildEDDResults <- function(connection){
+buildEDDResults <- function(results_list){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -11,37 +11,37 @@ buildEDDResults <- function(connection){
             suppressWarnings(suppressMessages(library(readxl)))
             
             #----- load project functions
-            source("scripts/getQueryResults.R") # equivalent to python "from x import function"
+            # source("scripts/getQueryResults.R") # equivalent to python "from x import function"
             # load example data
             example <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Results") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNDataManagement/Shared%20Documents/General/Standards/Data-Standards/EQuIS-WQX-EDD/NCRN_BSS_EDD_20230105_1300.xlsx?d=w8c283fde9cbd4af480945c8c8bd94ff6&csf=1&web=1&e=7Y9W1M
             
             # Query db
-            db_objs <- RODBC::sqlTables(con) # test db connection
-            tbl_names <- db_objs %>% # choose which tables you want to query
-                subset(TABLE_NAME %in% c(
-                    "tbl_Events",
-                    "tbl_Fish_Data",
-                    "tbl_Fish_Events",
-                    "tbl_GameFish",
-                    "tlu_Fish",
-                    "tbl_Locations"
-                )
-                ) %>%
-                select(TABLE_NAME)
-            
-            # make list of queries so we can extract a few rows from each table
-            qry_list <- vector(mode="list", length=nrow(tbl_names))
-            names(qry_list) <- tbl_names$TABLE_NAME
-            for (i in 1:length(qry_list)){
-                qry_list[[i]] <- paste("SELECT * FROM", names(qry_list)[i])
-            }
-            
-            results_list <- getQueryResults(qryList = qry_list, connection = con)
-            
-            # tidy up
-            rm(db_objs)
-            rm(tbl_names)
-            rm(qry_list)
+            # db_objs <- RODBC::sqlTables(con) # test db connection
+            # tbl_names <- db_objs %>% # choose which tables you want to query
+            #     subset(TABLE_NAME %in% c(
+            #         "tbl_Events",
+            #         "tbl_Fish_Data",
+            #         "tbl_Fish_Events",
+            #         "tbl_GameFish",
+            #         "tlu_Fish",
+            #         "tbl_Locations"
+            #     )
+            #     ) %>%
+            #     select(TABLE_NAME)
+            # 
+            # # make list of queries so we can extract a few rows from each table
+            # qry_list <- vector(mode="list", length=nrow(tbl_names))
+            # names(qry_list) <- tbl_names$TABLE_NAME
+            # for (i in 1:length(qry_list)){
+            #     qry_list[[i]] <- paste("SELECT * FROM", names(qry_list)[i])
+            # }
+            # 
+            # results_list <- getQueryResults(qryList = qry_list, connection = con)
+            # 
+            # # tidy up
+            # rm(db_objs)
+            # rm(tbl_names)
+            # rm(qry_list)
             
             # make a flat dataframe from `results_list`
             df <- results_list$tbl_Fish_Data

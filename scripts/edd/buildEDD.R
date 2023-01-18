@@ -16,22 +16,65 @@ buildEDD <- function(connection, write){
             suppressWarnings(suppressMessages(library(data.table)))
             
             #----- load project functions
-            source("scripts/buildEDDLocations.R")
-            source("scripts/buildEDDActivities.R")
-            source("scripts/buildEDDResults.R") # equivalent to python "from x import function"
+            source("scripts/edd/buildEDDLocations.R")
+            source("scripts/edd/buildEDDActivities.R")
+            source("scripts/edd/buildEDDResults.R") # equivalent to python "from x import function"
+            source("scripts/getQueryResults.R") # equivalent to python "from x import function"
             
-            activities <- buildEDDActivities(connection = con)
-            locations <- buildEDDLocations(connection = con)
-            results <- buildEDDResults(connection = con)
+            #-----  Query db
+            db_objs <- RODBC::sqlTables(con) # test db connection
+            tbl_names <- db_objs %>% # choose which tables you want to query
+                subset(TABLE_NAME %in% c(
+                    "tbl_Events",
+                    "tbl_Protocol",
+                    "tbl_Fish_Events",
+                    "tbl_Locations",
+                    "tbl_Meta_Events",
+                    "tlu_Collection_Procedures_Gear_Config",
+                    "tbl_Electro_Fish_Details",
+                    "tbl_Fish_Data",
+                    "tbl_GameFish",
+                    "tlu_Fish"
+                )
+                ) %>%
+                select(TABLE_NAME)
             
+            # make list of queries so we can extract a few rows from each table
+            qry_list <- vector(mode="list", length=nrow(tbl_names))
+            names(qry_list) <- tbl_names$TABLE_NAME
+            for (i in 1:length(qry_list)){
+                qry_list[[i]] <- paste("SELECT * FROM", names(qry_list)[i])
+            }
+            
+            results_list <- getQueryResults(qry_list = qry_list, connection = con)
+            RODBC::odbcCloseAll() # close db connection
+            
+            # tidy up
+            rm(db_objs)
+            rm(tbl_names)
+            rm(qry_list)
+            
+            #----- call functions that build data for EDD tabs
+            activities <- buildEDDActivities(results_list)
+            locations <- buildEDDLocations(results_list)
+            results <- buildEDDResults(results_list)
+            
+            #----- compile data for EDD tabs into a list
             list_of_datasets <- list("Locations" = locations, "Activities" = activities, "Results" = results)
-            assign("EDD", list_of_datasets, envir = globalenv())
+            if(length(list_of_datasets)==3){
+                if(nrow(list_of_datasets[[1]]>0) & nrow(list_of_datasets[[2]]>0) & nrow(list_of_datasets[[3]]>0)){
+                    message("\n\n`buildEDD() successfully produced data views.\nOutput saved as `EDD` in global environment.\n\n")
+                    assign("EDD", list_of_datasets, envir = globalenv()) # save final product to global environment
+                }
+            } else {
+                message("An error occurred when compiling results.")
+                break
+            }
+            
+            #----- write list to xlsx if `write` flag is TRUE
             if(write == TRUE){
                 openxlsx::write.xlsx(list_of_datasets, file = file.choose())
             }
-        },
-        finally = {
-            "`buildEDD() executed successfully"
         }
     )
 }
