@@ -1,6 +1,5 @@
 #--------------------------------------------------------------------------
 #----- Make Marc's 2022 data the required `EDD` format-----------------
-#----- One row is one e-fishing pass---------------------------------------
 #--------------------------------------------------------------------------
 # a module for `buildEDD()`
 options(warn=-1)
@@ -8,7 +7,6 @@ getMarc2022Activities <- function(marc2022, example){
     tryCatch(
         expr = {
             # make a flat dataframe where one row is one e-fishing pass from `df`
-            
             # format from wide-format data: $Total_Pass_1 and $Total_Pass_2 to long-format $value and $pass
             df <- marc2022
             counts <- df %>% 
@@ -117,45 +115,11 @@ getMarc2022Activities <- function(marc2022, example){
             acts[59] <- NA # "Current_Speed"
             acts[60] <- NA # "Current_Speed_Unit"
             acts[61] <- NA # "Toxicity_Test_Type"
-            # "Effort"
-            # we need to account for possible NA values since we're doing math
-            # we need to only do math if we have a valid start & end pair (i.e., use either pass 2 or pass 1 if only one pair is NA-free)
-            # if we have two valid start & end pairs, use both and sum them
-            acts[62] <- NA
-            # for (i in 1:nrow(acts)){
-            #     # scenario 1: Pass 1 has 2 NA-free values but there's a NA in Pass 2
-            #     if(!is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i]) & is.na(df$Pass_2_End[i]) | is.na(df$Pass_2_Start[i])){
-            #         acts[i,62] <- (df$Pass_1_End[i]-df$Pass_1_Start[i])
-            #     }
-            #     # scenario 2: Pass 2 has 2 NA-free values but there's a NA in Pass 1 
-            #     else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & is.na(df$Pass_1_End[i]) | is.na(df$Pass_1_Start[i])){
-            #         acts[i,62] <- (df$Pass_2_End[i]-df$Pass_2_Start[i])
-            #     }
-            #     # scenario 3: Both Pass 1 and Pass 2 are NA-free
-            #     else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & !is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i])){
-            #         acts[i,62] <- ((df$Pass_2_End[i]-df$Pass_2_Start[i]) + (df$Pass_1_End[i]-df$Pass_1_Start[i]))
-            #     }
-            # }
-            # "Effort_Unit"
-            acts[63] <- NA
-            # for (i in 1:nrow(acts)){ # for each row
-            #     if(!is.na(acts[i,62])){
-            #         acts[i,63] <- "seconds" # units are seconds
-            #     }
-            # }
+            acts[62] <- NA # "Effort"
+            acts[63] <- NA # "Effort_Unit"
             acts <- as.data.frame(lapply(acts, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
             colnames(acts)[1] <- "#Org_Code"
-            
-
-            
-            
-            
-            
-            
-            
-            
             # pass2022[32] <- '"data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData"' # Source
-                
                 
             # error-checking:
             check_df <- tibble::tibble(data.frame(matrix(ncol=3, nrow=ncol(acts))))
