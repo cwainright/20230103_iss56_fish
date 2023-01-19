@@ -40,7 +40,8 @@ buildEDD <- function(connection, write, addMarc){
                     "tbl_Electro_Fish_Details",
                     "tbl_Fish_Data",
                     "tbl_GameFish",
-                    "tlu_Fish"
+                    "tlu_Fish",
+                    "tlu_Basin_Code"
                 )
                 ) %>%
                 select(TABLE_NAME)
@@ -62,6 +63,7 @@ buildEDD <- function(connection, write, addMarc){
             
             #----- call functions that build data for EDD tabs
             activities <- getEDDActivities(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc)
+            assign("activities", activities, envir = globalenv())
             locations <- getEDDLocations(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc)
             # results <- getEDDResults(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc)
             
