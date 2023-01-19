@@ -3,7 +3,7 @@
 # database is from: https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 
 # build example
-
+options(warn=-1)
 buildEDD <- function(connection, write, addMarc){
     tryCatch(
         expr = {
@@ -18,7 +18,7 @@ buildEDD <- function(connection, write, addMarc){
             source("scripts/edd/getEDDResults.R") # equivalent to python "from x import function"
             source("scripts/getQueryResults.R") # equivalent to python "from x import function"
             
-            #----- read static assets
+            #----- read and pre-process static assets
             # https://doimspp.sharepoint.com/:f:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template?csf=1&web=1&e=beb0mc
             marc2021 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2021_Marc.xlsx", sheet = "Fish Data (Individuals)") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_2021_Marc.xlsx?d=w0ccc6d38b831430185bbbf15488bb366&csf=1&web=1&e=FJUBeO
             marc2022 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx?d=w306357b1a43a48f4b9f598169043cc6a&csf=1&web=1&e=hzGvLn
@@ -26,6 +26,18 @@ buildEDD <- function(connection, write, addMarc){
             data.table::setnames(marc2022, "Species_ID...13", "species_id")
             habitat_marc2021 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_Stream_Habitat_2021_Marc.xlsx", sheet = "Summer_Habitat_Data_2021") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_Stream_Habitat_2021_Marc.xlsx?d=w621453e1ce9f48a6a36d48850938f9cf&csf=1&web=1&e=B3sOOD
             habitat_marc2022 <- readxl::read_excel("data/NCRN_BSS_Fish_Monitoring_Data_Stream_Habitat_2022_Marc.xlsx", sheet = "Summer Habitat Data Sheet") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/Marc_and_Bob/Fish_Template/NCRN_BSS_Fish_Monitoring_Data_Stream_Habitat_2022_Marc.xlsx?d=web62dc84b1204861bb8fff2754a34c88&csf=1&web=1&e=5Um3sm
+            for(i in 1:nrow(marc2022)){
+                if(stringr::str_detect(marc2022$common_name[i], "\\(")==TRUE){
+                    marc2022$common_name[i] <- tolower(stringr::str_extract(marc2022$common_name[i], "(?<=\\().+?(?=\\))")) # https://stackoverflow.com/questions/8613237/extract-info-inside-all-parenthesis-in-r
+                }
+            }
+            marc2022$common_name <- tolower(marc2022$common_name)
+            for(i in 1:nrow(marc2021)){
+                if(stringr::str_detect(marc2021$Species_ID[i], "\\(")==TRUE){
+                    marc2021$Species_ID[i] <- tolower(stringr::str_extract(marc2021$Species_ID[i], "(?<=\\().+?(?=\\))")) # https://stackoverflow.com/questions/8613237/extract-info-inside-all-parenthesis-in-r
+                }
+            }
+            marc2021$Species_ID <- tolower(marc2021$Species_ID)
             
             #-----  Query db
             db_objs <- RODBC::sqlTables(con) # test db connection
@@ -63,21 +75,20 @@ buildEDD <- function(connection, write, addMarc){
             
             #----- call functions that build data for EDD tabs
             activities <- getEDDActivities(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc)
-            assign("activities", activities, envir = globalenv())
             locations <- getEDDLocations(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc)
-            # results <- getEDDResults(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc)
+            results <- getEDDResults(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc)
             
             #----- compile data for EDD tabs into a list
-            # list_of_datasets <- list("Locations" = locations, "Activities" = activities, "Results" = results)
-            # if(length(list_of_datasets)==3){
-            #     if(nrow(list_of_datasets[[1]]>0) & nrow(list_of_datasets[[2]]>0) & nrow(list_of_datasets[[3]]>0)){
-            #         assign("EDD", list_of_datasets, envir = globalenv()) # save final product to global environment
-            #         message("\n\n`buildEDD() successfully produced data views.\nOutput saved as `EDD` in global environment.\n\n")
-            #     }
-            # } else {
-            #     message("An error occurred when compiling results.")
-            #     break
-            # }
+            list_of_datasets <- list("Locations" = locations, "Activities" = activities, "Results" = results)
+            if(length(list_of_datasets)==3){
+                if(nrow(list_of_datasets[[1]]>0) & nrow(list_of_datasets[[2]]>0) & nrow(list_of_datasets[[3]]>0)){
+                    assign("EDD", list_of_datasets, envir = globalenv()) # save final product to global environment
+                    message("\n\n`buildEDD() successfully produced data views.\nOutput saved as `EDD` in global environment.\n\n")
+                }
+            } else {
+                message("An error occurred when compiling results.")
+                break
+            }
             
             #----- write list to xlsx if `write` flag is TRUE
             if(write == TRUE){

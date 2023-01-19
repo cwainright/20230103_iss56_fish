@@ -1,6 +1,6 @@
 # a module for `buildEDD()`
-
-getEDDResults <- function(results_list, marc2022, marc2021, addMarc){
+options(warn=-1)
+getEDDResults <- function(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -12,6 +12,8 @@ getEDDResults <- function(results_list, marc2022, marc2021, addMarc){
             #----- load project functions
             source("scripts/edd/getMarc2022Results.R")
             source("scripts/edd/getMarc2021Results.R")
+            source("scripts/edd/getMarcHabResults.R")
+            source("scripts/edd/buildLookup.R")
             
             #----- load project functions
             # source("scripts/getQueryResults.R") # equivalent to python "from x import function"
@@ -56,7 +58,7 @@ getEDDResults <- function(results_list, marc2022, marc2021, addMarc){
             real[1] <- "NCRN" # "#Org_Code" 
             real[2] <- combined$Fish_Event_ID # "Activity_ID" shared field with `real_activities.Activity_ID`
             real[3] <- combined$Characteristic_Name# "Characteristic_Name"  
-            real[4] <- combined$species # "Method_Speciation"
+            real[4] <- combined$Common_Name # "Method_Speciation"
             real[5] <- NA # "Filtered_Fraction"
             real[6] <- NA # "Result_Detection_Condition"
             real[7] <- combined$Result_Text # "Result_Text"
@@ -64,7 +66,7 @@ getEDDResults <- function(results_list, marc2022, marc2021, addMarc){
             real[9] <- NA # "Result_Qualifier"
             real[10] <- "Final" # "Result_Status" 
             real[11] <- "Actual" # "Result_Type" 
-            real[12] <- combined$Comments# "Result_Comment" 
+            real[12] <- combined$Comments # "Result_Comment" 
             real[13] <- NA # "Method_Detection_Limit"
             real[14] <- NA # "Lower_Quantification_Limit"
             real[15] <- NA # "Upper_Quantification_Limit" 
@@ -102,7 +104,7 @@ getEDDResults <- function(results_list, marc2022, marc2021, addMarc){
             real[47] <- NA # "Data_Logger_Line_Name"
             real[48] <- NA # "Biological_Intent"
             real[49] <- NA # "Biological_Individual_ID"
-            real[50] <- combined$Common_Name# "Subject_Taxon"
+            real[50] <- combined$species# "Subject_Taxon"
             real[51] <- NA # "Unidentified_Species_ID"
             real[52] <- NA # "Tissue_Anatomy"
             real[53] <- NA # "Group_Summary_Count_or_Weight"
@@ -148,9 +150,14 @@ getEDDResults <- function(results_list, marc2022, marc2021, addMarc){
             
             #----- if TRUE add Marc's 2022 data to dataframe `real` NCRN db data
             if(addMarc==TRUE){
-                marc2022_results <- getMarc2022Results(marc2022, example)
-                marc2021_results <- getMarc2022Results(marc2021, example)
-                real <- rbind(real, marc2022_results, marc2021_results)
+                # make a lookup table
+                tlu_species <- buildLookup(marc2022, results_list)
+                # run marc results modules
+                marc2022_results <- getMarc2022Results(marc2022, example, tlu_species)
+                marc2021_results <- getMarc2021Results(marc2021, example, tlu_species)
+                marc_habitat_results <- getMarcHabResults(habitat_marc2022, habitat_marc2021, example, results_list)
+                # combine
+                real <- rbind(real, marc2022_results, marc2021_results, marc_habitat_results)
             }
             
             # error-checking:
@@ -168,7 +175,7 @@ getEDDResults <- function(results_list, marc2022, marc2021, addMarc){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildEDDResults()` executed successfully..."
+                    "`getEDDResults()` executed successfully..."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))

@@ -1,6 +1,6 @@
 # a module for `buildEDD()`
-
-getEDDLocations <- function(results_list, marc2022, marc2021, addMarc){
+options(warn=-1)
+getEDDLocations <- function(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc){
     tryCatch(
         expr = {
             #----- load external libraries
@@ -11,6 +11,7 @@ getEDDLocations <- function(results_list, marc2022, marc2021, addMarc){
             
             #----- load project functions
             source("scripts/edd/getMarc2022Locations.R")
+            source("scripts/edd/getMarcHabLocations.R")
             
             #----- load project functions
             # source("scripts/getQueryResults.R") # equivalent to python "from x import function"
@@ -110,8 +111,9 @@ getEDDLocations <- function(results_list, marc2022, marc2021, addMarc){
             
             #----- if TRUE add Marc's 2022 data to dataframe `real` NCRN db data
             if(addMarc==TRUE){
-                marc2022_locations <- getMarc2022Locations(marc2022, example)
-                real <- rbind(real, marc2022_locations)
+                marc2022_locations <- getMarc2022Locations(marc2022, example, results_list)
+                marc_habitat_locations <- getMarcHabLocations(habitat_marc2022, habitat_marc2021, example, results_list) # NCRN doesn't have any of Marc's habitat data, so add both 2021 and 2022
+                real <- rbind(real, marc2022_locations, marc_habitat_locations)
             }
             
             # error-checking:
@@ -129,7 +131,7 @@ getEDDLocations <- function(results_list, marc2022, marc2021, addMarc){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildEDDLocations()` executed successfully..."
+                    "`getEDDLocations()` executed successfully..."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))

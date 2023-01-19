@@ -56,7 +56,7 @@ getMarcHabActivities <- function(habitat_marc2022, habitat_marc2021, example, re
             colnames(real) <- colnames(example) # name columns to match example
             
             real[1] <- "NCRN" # "#Org_Code" 
-            real[2] <- "Stream habitat monitoring" # "Project_ID"
+            real[2] <- "Stream habitat survey" # "Project_ID"
             real[3] <- df$Event_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
             real[4] <- df$Activity_ID # "Activity_ID" shared field with `real_locations.Activity_ID` and `real_results.Activity_ID`
             real[5] <- "Field Msr/Obs" # "Activity_Type"; choices are: 1) 'Field Msr/Obs' and 2) 'Sample-Routine'

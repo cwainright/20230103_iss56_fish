@@ -3,7 +3,7 @@
 #----- One row is one e-fishing pass---------------------------------------
 #--------------------------------------------------------------------------
 # a module for `buildEDD()`
-
+options(warn=-1)
 getMarc2022Activities <- function(marc2022, example){
     tryCatch(
         expr = {
@@ -172,7 +172,7 @@ getMarc2022Activities <- function(marc2022, example){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildMarc2022Activities()` executed successfully..."
+                    "`getMarc2022Activities()` executed successfully..."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`acts", check_df$acts[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))

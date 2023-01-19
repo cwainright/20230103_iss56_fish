@@ -1,32 +1,59 @@
 #--------------------------------------------------------------------------
 #----- Make Marc's 2021 data the required `example` format-----------------
-#----- One row is one individual fish--------------------------------------
 #--------------------------------------------------------------------------
 # a module for `buildEDD()`
-
-buildMarc2021Indiv <- function(marc2021, example){
+options(warn=-1)
+getMarc2021Results <- function(marc2021, example, tlu_species){
     tryCatch(
         expr = {
             #----- make a flat dataframe where one row is one e-fishing pass from `results_list`
             df <- marc2021
-            df$count <- 1
-    
+            df <- dplyr::left_join(df, tlu_species %>% select(-c(species_id)), by=c("Species_ID" = "Common_Name"))
+            df$dummy <- paste0(df$SampleDate, df$Pass_ID, df$Species_ID)
+            
+            # there are three metrics to report:
+            ### 1. Total length of individuals with != NA in df$TL_mm
+            df_tl <- df %>% subset(!is.na(TL_mm))
+            df_tl$Characteristic_Name <- "Fish total length in mm"
+            df_tl$Result_Unit <- "mm"
+            df_tl$Result_Text <- df_tl$TL_mm
+            
+            ### 2. Count (i.e., group by species, count individuals)
+            df_count <- df %>%
+                group_by(dummy) %>%
+                summarize(
+                    Result_Text = n()
+                )
+            df_count <- dplyr::left_join(df_count, df, by=c("dummy"))
+            df_count <- dplyr::distinct(df_count, dummy, .keep_all = TRUE)
+            df_count$Characteristic_Name <- "Fish count by species"
+            df_count$Result_Unit <- "Count of individuals"
+            df_count <- df_count %>% select(colnames(df_tl))
+            
+            ### 3. Weight of individuals with != NA in df$Wt_g
+            df_wt <- df %>% subset(!is.na(Wt_g))
+            df_wt$Characteristic_Name <- "Fish weight (mass) in g"
+            df_wt$Result_Unit <- "g"
+            df_wt$Result_Text <- df_wt$Wt_g
+            #----- combine
+            df <- rbind(df_count, df_tl, df_wt)
+            
             #----- re-build `example` from `results_list`
-            real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(combined)))) # empty dataframe
+            real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(df)))) # empty dataframe
             colnames(real) <- colnames(example) # name columns to match example
             
             real[1] <- "NCRN" # "#Org_Code" 
-            real[2] <- combined$Fish_Event_ID # "Activity_ID" shared field with `real_activities.Activity_ID`
-            real[3] <- combined$Characteristic_Name# "Characteristic_Name"  
-            real[4] <- combined$species # "Method_Speciation"
+            real[2] <- df$FishObsID # "Activity_ID"
+            real[3] <- df$Characteristic_Name# "Characteristic_Name"  
+            real[4] <- df$Species_ID # "Method_Speciation"
             real[5] <- NA # "Filtered_Fraction"
             real[6] <- NA # "Result_Detection_Condition"
-            real[7] <- combined$Result_Text # "Result_Text"
-            real[8] <- combined$Result_Unit# "Result_Unit"
+            real[7] <- df$Result_Text # "Result_Text"
+            real[8] <- df$Result_Unit# "Result_Unit"
             real[9] <- NA # "Result_Qualifier"
             real[10] <- "Final" # "Result_Status" 
             real[11] <- "Actual" # "Result_Type" 
-            real[12] <- combined$Comments# "Result_Comment" 
+            real[12] <- NA # "Result_Comment" 
             real[13] <- NA # "Method_Detection_Limit"
             real[14] <- NA # "Lower_Quantification_Limit"
             real[15] <- NA # "Upper_Quantification_Limit" 
@@ -41,7 +68,7 @@ buildMarc2021Indiv <- function(marc2021, example){
             real[24] <- NA # "Confidence_Interval" 
             real[25] <- NA # "Upper_Confidence_Limit" 
             real[26] <- NA # "Lower_Confidence_Limit" 
-            real[27] <- combined$Loc_Name# "Result_Sampling_Point_Name"
+            real[27] <- df$Station_Name# "Result_Sampling_Point_Name"
             real[28] <- NA # "Result_Depth_Height_Measure"
             real[29] <- NA # "Result_Depth_Height_Measure_Unit" 
             real[30] <- NA # "Result_Depth_Altitude_Reference_Point"
@@ -49,8 +76,8 @@ buildMarc2021Indiv <- function(marc2021, example){
             real[32] <- NA # "Analytical_Remark"
             real[33] <- NA # "Lab_ID"
             real[34] <- NA # "Lab_Remark_Code"
-            real[35] <- format(combined$Start_Date, "%Y-%m-%d") # "Analysis_Start_Date"
-            real[36] <- format(combined$Start_Time, "%H:%M") # "Analysis_Start_Time" 
+            real[35] <- format(as.Date(df$SampleDate), "%Y-%m-%d") # "Analysis_Start_Date"
+            real[36] <- format(as.Date(df$SampleDate), "%H:%M") # "Analysis_Start_Time" 
             real[37] <- "Eastern Time - Washington, DC" # "Analysis_Start_Time_Zone"
             real[38] <- NA # "Lab_Accreditation_Indicator"
             real[39] <- NA # "Lab_Accreditation_Authority_Name" 
@@ -64,7 +91,7 @@ buildMarc2021Indiv <- function(marc2021, example){
             real[47] <- NA # "Data_Logger_Line_Name"
             real[48] <- NA # "Biological_Intent"
             real[49] <- NA # "Biological_Individual_ID"
-            real[50] <- combined$Common_Name# "Subject_Taxon"
+            real[50] <- df$Species_ID # "Subject_Taxon"
             real[51] <- NA # "Unidentified_Species_ID"
             real[52] <- NA # "Tissue_Anatomy"
             real[53] <- NA # "Group_Summary_Count_or_Weight"
@@ -107,8 +134,8 @@ buildMarc2021Indiv <- function(marc2021, example){
             
             real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
             colnames(real)[1] <- "#Org_Code"
-            # real[32] <- '"data/NCRN_BSS_Fish_Monitoring_Data_2021_Marc.xlsx", sheet = "Fish Data (individuals)"'
-
+            # indiv[32] <- '"data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData"'
+            
             # error-checking:
             check_df <- tibble::tibble(data.frame(matrix(ncol=3, nrow=ncol(real))))
             colnames(check_df) <- c("real", "example", "result")
@@ -124,15 +151,14 @@ buildMarc2021Indiv <- function(marc2021, example){
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildMarc2021real()` executed successfully..."
+                    "`getMarc2021Results()` executed successfully..."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
-                        cat(paste(paste0("`real_2021", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
+                        cat(paste(paste0("`real_2022", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
                     }
                 }
             )
             # assign("pass2022", pass2022, envir = globalenv())
-            
             return(real)
         }
     )

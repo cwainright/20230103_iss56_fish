@@ -30,6 +30,8 @@
     # 1) passes
     # 2) individuals
 
+rm(list=ls())
+
 #----- load external libraries
 library(data.table)
 library(tidyverse)
@@ -39,16 +41,18 @@ library(RODBC)
 library(openxlsx)
 
 #----- load project functions
-source("scripts/buildEDD.R")
-source("scripts/buildBioMonTools.R")
-source("scripts/buildMarcView.R")
+source("scripts/edd/buildEDD.R")
+# source("scripts/bio_mon_tools/buildBioMonTools.R")
+source("scripts/marc/buildMarcView.R")
 
 # Connect to db
+RODBC::odbcCloseAll() # close db connection
 db <- ("C:/Users/cwainright/OneDrive - DOI/Documents - NPS-NCRN-Biological Stream Sampling/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb")# https://doimspp.sharepoint.com/:u:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Annual-Data-Packages/2022/NCRN_MBSS/NCRN_MBSS_be_2022.mdb?csf=1&web=1&e=jjeJIg
 # db <- file.choose()
 con <- RODBC::odbcConnectAccess2007(db) # open db connection
-# buildEDD(connection = con, write = FALSE)
+
+buildEDD(connection = con, write = FALSE, addMarc = TRUE)
 # buildBioMonTools(connection = con, write = FALSE)
-buildMarc(connection = con, write = TRUE, addMarc = TRUE)
+buildMarc(connection = con, write = FALSE, addMarc = TRUE)
 
 RODBC::odbcCloseAll() # close db connection

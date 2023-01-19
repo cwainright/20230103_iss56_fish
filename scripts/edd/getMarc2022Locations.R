@@ -3,7 +3,7 @@
 #----- One row is one individual fish--------------------------------------
 #--------------------------------------------------------------------------
 # a module for `buildEDD()`
-
+options(warn=-1)
 getMarc2022Locations <- function(marc2022, example, results_list){
     tryCatch(
         expr = {
@@ -54,7 +54,7 @@ getMarc2022Locations <- function(marc2022, example, results_list){
             real[27] <- "US" # "Country_Code"
             real[28] <- df$State # "State_Code"
             real[29] <- df$County # "County_Name"
-            real[30] <- df$Catchment_Area # "Drainage_Area"
+            real[30] <- sprintf("%.3f", df$Catchment_Area) # "Drainage_Area"
             # "Drainage_Area_Unit"; design view db.tbl_Locations
             for(i in 1:nrow(real)){
                 # catch NA catchment areas
@@ -62,7 +62,6 @@ getMarc2022Locations <- function(marc2022, example, results_list){
                     real[i,31] <- "acre"
                 }
             }
-            real[30] <- sprintf("%.3f", df$Catchment_Area) # round "Drainage_Area"
             real[32] <- NA # "Contributing_Area"
             real[33] <- NA # "Contributing_Area_Unit"
             real[34] <- NA # "Tribal_Land_Indicator"

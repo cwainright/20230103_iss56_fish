@@ -1,5 +1,5 @@
 # a module for `buildEDD()`
-
+options(warn=-1)
 getEDDActivities <- function(results_list, marc2022, marc2021, habitat_marc2021, habitat_marc2022, addMarc){
     tryCatch(
         expr = {
@@ -176,7 +176,7 @@ getEDDActivities <- function(results_list, marc2022, marc2021, habitat_marc2021,
             
             message(
                 if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`buildEDDActivities()` executed successfully..."
+                    "`getEDDActivities()` executed successfully..."
                 } else {
                     for(i in 1:length(check_df$result != "MATCH")){
                         cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
