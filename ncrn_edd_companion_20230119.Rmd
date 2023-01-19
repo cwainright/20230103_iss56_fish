@@ -1,0 +1,17 @@
+---
+title: "Biological Stream Survey EDD"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+## Overview
+
+The file `ncrn_edd_biological_stream_surveys_cumulative.xlsx` is an Excel workbook (hereafter "workbook") containing the cumulative biological stream survey data (hereafter "dataset") collected by USNPS National Capital Region Network (NCRN) and affiliates. This markdown document explains the contents of the workbook, the data model used to arrange the dataset, and provides general guidelines for interpreting the dataset.
+
+## Methods
+
+### Data model and metadata
+
+Three types of data (1. `fish`, 2. `habitat`, and 3. `water chemistry`) data are presented in [electronic data deliverable (EDD) format](https://www.epa.gov/sites/default/files/2016-01/documents/r2comprehensivemanual_sept2015.pdf). The EDD contains three data views (`activities`, `results`, and `locations`).
+
+I tried to cross-reference to make categorical variables consistent among years and sampling methods. However, sometimes I didn't have a lookup table to rely on and there was no field integrity among data sources to facilitate cross-referencing. E.g., beware "Method_Speciation" column in 'habitat' `results`. I didn't have a way to cross-reference between Marc's 2021 and 2022 naming convention for all habitat metrics (e.g., 'ERODEXLT' versus 'Left_Bank_Erosion_Extent'). That means you'll need to do the cross-referencing to make sure you're aggregating all of the same metrics.
