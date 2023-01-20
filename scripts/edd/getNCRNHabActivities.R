@@ -10,24 +10,40 @@ getNCRNHabActivities <- function(results_list, example){
             suppressWarnings(suppressMessages(library(readxl)))
             
             # make a flat dataframe from `results_list`
+            df_spring <- results_list$tbl_Spring_PHI %>% dplyr::distinct(Spring_PHI_ID, .keep_all = TRUE)
+            data.table::setnames(df_spring, "Spring_PHI_ID", "PHI_ID")
+            df_spring <- dplyr::left_join(df_spring, results_list$tbl_Events %>% select(Event_ID, Protocol_ID, Start_Date, Start_Time, Location_ID, Comments, Event_Site_ID, Event_Group_ID), by = "Event_ID")
+            df_spring <- dplyr::left_join(df_spring, results_list$tbl_Protocol %>% select(Protocol_ID, Protocol_Name, Protocol_Version, Version_Date), by = "Protocol_ID")
+            df_spring <- dplyr::left_join(df_spring, results_list$tbl_Meta_Events %>% select(Event_ID, Entered_by), by = "Event_ID")
+            df_spring <- dplyr::left_join(df_spring, results_list$tbl_Locations %>% select(Location_ID, Loc_Name, NCRN_Site_ID), by = "Location_ID")
+            df_spring <- df_spring %>% select(PHI_ID, Event_Site_ID, Event_ID, Start_Date, Start_Time, Loc_Name, Entered_by, NCRN_Site_ID, Comments, Protocol_Version, Version_Date,
+                                              Event_Group_ID, NCRN_Site_ID)
             
-            ##### ADD DATA WRANGLING HERE #####
+            df_summer <- results_list$tbl_Summer_PHI %>% dplyr::distinct(Summer_PHI_ID, .keep_all = TRUE)
+            data.table::setnames(df_summer, "Summer_PHI_ID", "PHI_ID")
+            df_summer <- dplyr::left_join(df_summer, results_list$tbl_Events %>% select(Event_ID, Protocol_ID, Start_Date, Start_Time, Location_ID, Comments, Event_Site_ID, Event_Group_ID), by = "Event_ID")
+            df_summer <- dplyr::left_join(df_summer, results_list$tbl_Protocol %>% select(Protocol_ID, Protocol_Name, Protocol_Version, Version_Date), by = "Protocol_ID")
+            df_summer <- dplyr::left_join(df_summer, results_list$tbl_Meta_Events %>% select(Event_ID, Entered_by), by = "Event_ID")
+            df_summer <- dplyr::left_join(df_summer, results_list$tbl_Locations %>% select(Location_ID, Loc_Name, NCRN_Site_ID), by = "Location_ID")
+            df_summer <- df_summer %>% select(PHI_ID, Event_Site_ID, Event_ID, Start_Date, Start_Time, Loc_Name, Entered_by, NCRN_Site_ID, Comments, Protocol_Version, Version_Date,
+                                              Event_Group_ID, NCRN_Site_ID)
             
+            df <- rbind(df_spring, df_summer)
             
             #----- re-build `example` from `results_list`
             # starting point: copy the example dataframe but without data
-            real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(results_list$tbl_Fish_Events)))) # empty dataframe
+            real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(df)))) # empty dataframe
             colnames(real) <- colnames(example) # name columns to match example
             
             real[1] <- "NCRN" # "#Org_Code" 
-            real[2] <- df$Protocol_Name # "Project_ID"
+            real[2] <- "Stream water chemistry" # "Project_ID"
             real[3] <- df$Event_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
-            real[4] <- df$Fish_Event_ID # "Activity_ID" shared field with `real_locations.Activity_ID` and `real_results.Activity_ID`
+            real[4] <- df$PHI_ID # "Activity_ID" shared field with `real_locations.Activity_ID` and `real_results.Activity_ID`
             real[5] <- "Field Msr/Obs" # "Activity_Type"; choices are: 1) 'Field Msr/Obs' and 2) 'Sample-Routine'
             real[6] <- "Water" # "Medium"  choices are "Water", "Air", and "Other" in `example`
             real[7] <- NA # "Medium_Subdivision"
-            real[8] <- "Stream Fish" # "Assemblage_Sampled_Name"
-            real[9] <- format(df$SampleDate, "%Y-%m-%d") # "Activity_Start_Date"
+            real[8] <- "Stream water chemistry" # "Assemblage_Sampled_Name"
+            real[9] <- format(df$Start_Date, "%Y-%m-%d") # "Activity_Start_Date"
             real[10] <- format(df$Start_Time, "%H:%M") # "Activity_Start_Time" 
             real[11] <- "Eastern Time - Washington, DC" # "Activity_Start_Time_Zone" 
             real[12] <- NA # "Activity_End_Date" 
@@ -41,25 +57,12 @@ getNCRNHabActivities <- function(results_list, example){
             real[20] <- NA # "Activity_Depth_Reference"
             real[21] <- df$Loc_Name # "Additional_Location_Info"
             real[22] <- NA # "Activity_Sampler"; the person who did the sampling?
-            # "Activity_Recorder"
-            real[23] <- df$Entered_by
-            for (i in 1:nrow(real)){ # for each row
-                ifelse(stringr::str_detect(real$Activity_Recorder[i], "Event") == TRUE, # 'Event' ends up in some records, so we regex to remove
-                       # regex to extract strings matching pattern:
-                       # String starts with (^) any character (*)
-                       # followed by one or more (+) numbers ([0-9])
-                       # followed by a dash (-)
-                       # followed by one or more (+) numbers ([0-9])
-                       # followed by a period (.)
-                       # followed by one or more (+) numbers ([0-9])
-                       real[i,23] <- stringr::str_extract(real[i,23], "^*([0-9])+-([0-9])+.([0-9])+"),
-                       real[i,23] <- real[i,23])# units are meters
-            }
+            real[23] <- df$Entered_by # "Activity_Recorder"
             real[24] <- df$NCRN_Site_ID # "Custody_ID" 
             real[25] <- "NCRN" # "Activity_Conducting_Organization" 
             real[26] <- NA # "Station_Visit_Comment" 
             real[27] <- df$Comments # "Activity_Comment
-            real[28] <- paste0(df$Protocol_Name, "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Collection_Method_ID" 
+            real[28] <- paste0("Stream water chemistry", "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Collection_Method_ID" 
             real[29] <- NA # Possibly a Smith Root LR-24 but not known; "Collection_Equipment_Name" 
             real[30] <- NA # Possibly a Smith Root LR-24 but not known; # "Collection_Equipment_Description" 
             real[31] <- NA # subset(results_list$tlu_Collection_Procedures_Gear_Config, `Field Gear Category` == "Smith Root LR-24")$`Field Procedure ID` # "Gear_Deployment"
@@ -67,8 +70,8 @@ getNCRNHabActivities <- function(results_list, example){
             real[33] <- NA # "Container_Color"
             real[34] <- NA # "Container_Size"
             real[35] <- NA # "Container_Size_Unit"
-            real[36] <- paste0(df$Protocol_Name, "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Preparation_Method_ID"
-            real[37] <- "10% buffered formalin solution (later transferable to 70% EtOH solution)" # "Chemical_Preservative" # pdf pg 124 (135) https://doimspp.sharepoint.com/:b:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Operational%20Reviews/NCRN_Biological_Stream_Survey_Protocol_Ver_2.0_NRR.pdf?csf=1&web=1&e=u0kGN9
+            real[36] <- paste0("Stream water chemistry", "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Preparation_Method_ID"
+            real[37] <- NA # "Chemical_Preservative" # pdf pg 124 (135) https://doimspp.sharepoint.com/:b:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Operational%20Reviews/NCRN_Biological_Stream_Survey_Protocol_Ver_2.0_NRR.pdf?csf=1&web=1&e=u0kGN9
             real[38] <- NA # "Thermal_Preservative". Fish are preserved via chemicals, not wet ice
             real[39] <- NA # "Transport_Storage_Description" 
             real[40] <- df$Event_Group_ID # "Activity_Group_ID"
@@ -78,29 +81,13 @@ getNCRNHabActivities <- function(results_list, example){
                                NA)# "Activity_Group_Type"  
             real[43] <- NA # we don't record stop time for fish events e-fishing, so duration is unknown
             real[44] <- NA # we don't record stop time for fish events e-fishing, so duration unit is unknown
-            real[45] <- "Two-pass backpack electrofishing" # Sampling_Component_Name
+            real[45] <- "Stream water chemistry" # Sampling_Component_Name
             real[46] <- NA # Sampling_Component_Place_In_Series
-            real[47] <- df$Seg_Length # "Reach_Length"
-            # Reach_Length_Unit
-            for (i in 1:nrow(real)){ # for each row
-                if(!is.na(real[i,47])){ # 75 m is the prescribed e-fishing reach distance; 
-                    real[i,48] <- "m" # units are meters
-                } else {# otherwise
-                    real[i,48] <- NA #assign NA when "Reach_Length" is blank
-                }
-            }
+            real[47] <- NA # "Reach_Length"
+            real[48] <- NA# Reach_Length_Unit
             real[49] <- NA # "Reach_Width"
             real[50] <- NA # "Reach_Width_Unit" 
-            # [electrofishing] "Pass_Count"
-            # only assign a "Pass_Count" value if we know the reach length
-            # because this gives us higher confidence that the record used the 2-pass e-fishing protocol
-            for (i in 1:nrow(real)){ # for each row
-                if(!is.na(real[i,47])){ # 75 m is the prescribed e-fishing reach distance; 
-                    real[i,51] <- 2 # units are meters
-                } else {# otherwise
-                    real[i,51] <- NA #assign NA when "Reach_Length" is blank
-                }
-            }
+            real[51] <- NA # [electrofishing] "Pass_Count"
             real[52] <- NA # "Net_Type"
             real[53] <- NA # "Net_Surface_Area"
             real[54] <- NA # "Net_Surface_Area_Unit"
@@ -111,30 +98,8 @@ getNCRNHabActivities <- function(results_list, example){
             real[59] <- NA # "Current_Speed"
             real[60] <- NA # "Current_Speed_Unit"
             real[61] <- NA # "Toxicity_Test_Type"
-            # "Effort"
-            # we need to account for possible NA values since we're doing math
-            # we need to only do math if we have a valid start & end pair (i.e., use either pass 2 or pass 1 if only one pair is NA-free)
-            # if we have two valid start & end pairs, use both and sum them
-            for (i in 1:nrow(real)){
-                # scenario 1: Pass 1 has 2 NA-free values but there's a NA in Pass 2
-                if(!is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i]) & is.na(df$Pass_2_End[i]) | is.na(df$Pass_2_Start[i])){
-                    real[i,62] <- (df$Pass_1_End[i]-df$Pass_1_Start[i])
-                }
-                # scenario 2: Pass 2 has 2 NA-free values but there's a NA in Pass 1 
-                else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & is.na(df$Pass_1_End[i]) | is.na(df$Pass_1_Start[i])){
-                    real[i,62] <- (df$Pass_2_End[i]-df$Pass_2_Start[i])
-                }
-                # scenario 3: Both Pass 1 and Pass 2 are NA-free
-                else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & !is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i])){
-                    real[i,62] <- ((df$Pass_2_End[i]-df$Pass_2_Start[i]) + (df$Pass_1_End[i]-df$Pass_1_Start[i]))
-                }
-            }
-            # "Effort_Unit"
-            for (i in 1:nrow(real)){ # for each row
-                if(!is.na(real[i,62])){
-                    real[i,63] <- "seconds" # units are seconds
-                }
-            }
+            real[62] <- NA # "Effort"
+            real[63] <- NA # "Effort_Unit"
             real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
             colnames(real)[1] <- "#Org_Code"
             # test <- cbind(real_activities[62:63], df$Pass_1_End, df$Pass_1_Start, df$Pass_2_End, df$Pass_2_Start) # check the `$Effort` math in real[62]
