@@ -36,13 +36,13 @@ getNCRNHabActivities <- function(results_list, example){
             colnames(real) <- colnames(example) # name columns to match example
             
             real[1] <- "NCRN" # "#Org_Code" 
-            real[2] <- "Stream water chemistry" # "Project_ID"
+            real[2] <- "Stream habitat inventory" # "Project_ID"
             real[3] <- df$Event_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
             real[4] <- df$PHI_ID # "Activity_ID" shared field with `real_locations.Activity_ID` and `real_results.Activity_ID`
             real[5] <- "Field Msr/Obs" # "Activity_Type"; choices are: 1) 'Field Msr/Obs' and 2) 'Sample-Routine'
             real[6] <- "Water" # "Medium"  choices are "Water", "Air", and "Other" in `example`
             real[7] <- NA # "Medium_Subdivision"
-            real[8] <- "Stream water chemistry" # "Assemblage_Sampled_Name"
+            real[8] <- "Stream habitat inventory" # "Assemblage_Sampled_Name"
             real[9] <- format(df$Start_Date, "%Y-%m-%d") # "Activity_Start_Date"
             real[10] <- format(df$Start_Time, "%H:%M") # "Activity_Start_Time" 
             real[11] <- "Eastern Time - Washington, DC" # "Activity_Start_Time_Zone" 
@@ -62,7 +62,7 @@ getNCRNHabActivities <- function(results_list, example){
             real[25] <- "NCRN" # "Activity_Conducting_Organization" 
             real[26] <- NA # "Station_Visit_Comment" 
             real[27] <- df$Comments # "Activity_Comment
-            real[28] <- paste0("Stream water chemistry", "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Collection_Method_ID" 
+            real[28] <- paste0("Stream habitat inventory", "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Collection_Method_ID" 
             real[29] <- NA # Possibly a Smith Root LR-24 but not known; "Collection_Equipment_Name" 
             real[30] <- NA # Possibly a Smith Root LR-24 but not known; # "Collection_Equipment_Description" 
             real[31] <- NA # subset(results_list$tlu_Collection_Procedures_Gear_Config, `Field Gear Category` == "Smith Root LR-24")$`Field Procedure ID` # "Gear_Deployment"
@@ -70,7 +70,7 @@ getNCRNHabActivities <- function(results_list, example){
             real[33] <- NA # "Container_Color"
             real[34] <- NA # "Container_Size"
             real[35] <- NA # "Container_Size_Unit"
-            real[36] <- paste0("Stream water chemistry", "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Preparation_Method_ID"
+            real[36] <- paste0("Stream habitat inventory", "; version ", df$Protocol_Version, "; protocol date ", df$Version_Date) # "Preparation_Method_ID"
             real[37] <- NA # "Chemical_Preservative" # pdf pg 124 (135) https://doimspp.sharepoint.com/:b:/r/sites/NCRNBiologicalStreamSampling/Shared%20Documents/General/Operational%20Reviews/NCRN_Biological_Stream_Survey_Protocol_Ver_2.0_NRR.pdf?csf=1&web=1&e=u0kGN9
             real[38] <- NA # "Thermal_Preservative". Fish are preserved via chemicals, not wet ice
             real[39] <- NA # "Transport_Storage_Description" 
@@ -81,7 +81,7 @@ getNCRNHabActivities <- function(results_list, example){
                                NA)# "Activity_Group_Type"  
             real[43] <- NA # we don't record stop time for fish events e-fishing, so duration is unknown
             real[44] <- NA # we don't record stop time for fish events e-fishing, so duration unit is unknown
-            real[45] <- "Stream water chemistry" # Sampling_Component_Name
+            real[45] <- "Stream habitat inventory" # Sampling_Component_Name
             real[46] <- NA # Sampling_Component_Place_In_Series
             real[47] <- NA # "Reach_Length"
             real[48] <- NA# Reach_Length_Unit
