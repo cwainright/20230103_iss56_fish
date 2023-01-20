@@ -32,6 +32,9 @@ getEDDActivities <- function(results_list, marc2022, marc2021, habitat_marc2021,
                 real <- rbind(real, marc2022_activities, marc_habitat_activities) # row bind project function returns
             }
             
+            #----- keep only unique Activities
+            real <- real %>% distinct(Activity_ID, .keep_all = TRUE)
+            
             # error-checking:
             check_df <- tibble::tibble(data.frame(matrix(ncol=3, nrow=ncol(real))))
             colnames(check_df) <- c("real", "example", "result")
