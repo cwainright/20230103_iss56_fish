@@ -53,7 +53,10 @@ buildEDD <- function(connection, write, addMarc){
                     "tbl_Fish_Data",
                     "tbl_GameFish",
                     "tlu_Fish",
-                    "tlu_Basin_Code"
+                    "tlu_Basin_Code",
+                    "tbl_Summer_PHI",
+                    "tbl_Spring_PHI",
+                    "tbl_Chemistry_Data"
                 )
                 ) %>%
                 select(TABLE_NAME)
