@@ -10,7 +10,7 @@ getNCRNHabResults <- function(results_list, example){
             suppressWarnings(suppressMessages(library(readxl)))
             
             #----- load project functions
-            source("scripts/edd/getNCRNPHILookup")
+            source("scripts/edd/getNCRNPHILookup.R")
             
             # make a flat dataframe from `results_list`
             # spring data
@@ -37,8 +37,9 @@ getNCRNHabResults <- function(results_list, example){
             # combine spring and summer
             df <- rbind(df_spring, df_summer)
             df$Characteristic_Name <- "Stream habitat inventory"
-            df <- dplyr::left_join(df, results_list$tbl_Events %>% select(Event_ID, Start_Date, Start_Time, Location_ID), by = "Event_ID")
+            df <- dplyr::left_join(df, results_list$tbl_Events %>% select(Event_ID, Start_Date, Start_Time, Location_ID, Comments), by = "Event_ID")
             df <- dplyr::left_join(df, results_list$tbl_Locations %>% select(Location_ID, Loc_Name), by = "Location_ID")
+            df <- dplyr::left_join(df, lookup, by=c("variable" = "short"))
             
             #----- re-build `example` from `results_list`
             real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(df)))) # empty dataframe
@@ -47,12 +48,12 @@ getNCRNHabResults <- function(results_list, example){
             real[1] <- "NCRN" # "#Org_Code" 
             real[2] <- df$PHI_ID # "Activity_ID" shared field with `real_activities.Activity_ID`
             real[3] <- df$Characteristic_Name # "Characteristic_Name"  
-            real[4] <- df$variable # "Method_Speciation"
+            real[4] <- df$long # "Method_Speciation"
             real[5] <- NA # "Filtered_Fraction"
             real[6] <- NA # "Result_Detection_Condition"
             real[7] <- df$value # "Result_Text"
-            real[8] <- df$Result_Unit # "Result_Unit"
-            real[9] <- NA # "Result_Qualifier"
+            real[8] <- df$unit # "Result_Unit"
+            real[9] <- df$source # "Result_Qualifier"
             real[10] <- "Final" # "Result_Status" 
             real[11] <- "Actual" # "Result_Type" 
             real[12] <- df$Comments # "Result_Comment" 

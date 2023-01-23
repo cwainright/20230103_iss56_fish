@@ -47,20 +47,33 @@ getNCRNPHILookup <- function(springvars, summervars){
             test$var <- NULL
             test$source <- NULL
             colnames(test) <- c("long", "short", "source")
-            
-            
-            lookup <- dplyr::left_join(lookup, metadata, )
-            
-            message(
-                if(length(check_df$result == "MATCH") == nrow(check_df)){
-                    "`getNCRNPHILookup()` executed successfully..."
+            # this regex grabs most of the correct units
+            for(i in 1:nrow(test)){
+                test$unit[i] <- stringr::str_extract(test$long[i], "(?<=\\().+?(?=\\))")
+            }
+            # the units the regex can't extract, we fix manually:
+            test$unit[4] <- NA # temp logger serial number
+            for(i in 1:nrow(test))(
+                if(stringr::str_detect(test$long[i], "presence/absence")){
+                    test$unit[i] <- "0 = absence, 1 = presence"
+                } else
+                if(stringr::str_detect(test$long[i], "present/absent")){
+                    test$unit[i] <- "A = absent, P = present"
+                } else
+                if(stringr::str_detect(test$long[i], "yes/no")){
+                    test$unit[i] <- "0 = no, i.e., absent; 1 = yes, i.e, present"
+                } else
+                if(stringr::str_detect(test$long[i], "present, absent, extensive")){
+                    test$unit[i] <- "A = absent, P = present, E = extensive"
                 } else {
-                    for(i in 1:length(check_df$result != "MATCH")){
-                        cat(paste(paste0("`real.", check_df$real[i], "`"), paste0(" DID NOT MATCH `example.", check_df$example[i][i], "`"), "\n", sep = ""))
-                    }
+                    test$unit[i] <- test$unit[i]
                 }
             )
-            return(real)
+            
+            message(
+                "`getNCRNPHILookup()` executed successfully..."
+            )
+            return(test)
         }
     )
 }
