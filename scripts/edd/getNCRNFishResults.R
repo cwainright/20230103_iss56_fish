@@ -12,13 +12,24 @@ getNCRNFishResults <- function(results_list, example){
             # make a flat dataframe from `results_list`
             df <- results_list$tbl_Fish_Data
             df$Characteristic_Name <- "Fish count by species"
-            df$Result_Text <- df$Total_Pass_1 + df$Total_Pass_2
+            df$Result_Text <- df$Total_Pass_1
             df$Result_Unit <- "count of individuals"
             df <- dplyr::left_join(df, results_list$tlu_Fish %>% select(Latin_Name, Common_Name), by = c("Fish_Species" = "Latin_Name"))
             df <- rename(df, species = Fish_Species)
+            df$Result_Qualifier <- "Electofishing pass 1"
+            
+            df2 <- results_list$tbl_Fish_Data
+            df2$Characteristic_Name <- "Fish count by species"
+            df2$Result_Text <- df$Total_Pass_2
+            df2$Result_Unit <- "count of individuals"
+            df2 <- dplyr::left_join(df2, results_list$tlu_Fish %>% select(Latin_Name, Common_Name), by = c("Fish_Species" = "Latin_Name"))
+            df2 <- rename(df2, species = Fish_Species)
+            df2$Result_Qualifier <- "Electofishing pass 2"
+            
+            df <- rbind(df, df2)
             
             df2 <- results_list$tbl_GameFish
-            df2$Characteristic_Name <- "Individual fish total length"
+            df2$Characteristic_Name <- "Individual fish total length in mm"
             df2$Result_Text <- df2$LENGTH
             df2$Result_Unit <- "mm"
             results_list$tlu_Fish$Common_Name <- trimws(results_list$tlu_Fish$Common_Name, which=c("both"))
@@ -27,15 +38,17 @@ getNCRNFishResults <- function(results_list, example){
             df2 <- rename(df2, species = Latin_Name)
             df2 <- rename(df2, Common_Name = SPECIES)
             df2$Comments <- NA
+            df2$Result_Qualifier <- NA
             
             combined <- rbind(
-                df %>% select(Fish_Event_ID, Characteristic_Name, species, Common_Name, Result_Text, Result_Unit, Comments),
-                df2 %>% select(Fish_Event_ID, Characteristic_Name, species, Common_Name, Result_Text, Result_Unit, Comments)
+                df %>% select(Fish_Event_ID, Characteristic_Name, species, Common_Name, Result_Text, Result_Unit, Comments, Result_Qualifier),
+                df2 %>% select(Fish_Event_ID, Characteristic_Name, species, Common_Name, Result_Text, Result_Unit, Comments, Result_Qualifier)
             )
             combined$Common_Name <- tolower(combined$Common_Name)
             combined <- dplyr::left_join(combined, results_list$tbl_Fish_Events %>% select(Fish_Event_ID, Event_ID), by = "Fish_Event_ID")
             combined <- dplyr::left_join(combined, results_list$tbl_Events %>% select(Event_ID, Start_Date, Start_Time, Location_ID), by = "Event_ID")
             combined <- dplyr::left_join(combined, results_list$tbl_Locations %>% select(Location_ID, Loc_Name), by = "Location_ID")
+            combined$Result_Qualifier <- paste0(combined$Start_Date, ";", combined$Result_Qualifier)
             
             #----- re-build `example` from `results_list`
             real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(combined)))) # empty dataframe
@@ -49,7 +62,7 @@ getNCRNFishResults <- function(results_list, example){
             real[6] <- NA # "Result_Detection_Condition"
             real[7] <- combined$Result_Text # "Result_Text"
             real[8] <- combined$Result_Unit# "Result_Unit"
-            real[9] <- NA # "Result_Qualifier"
+            real[9] <- combined$Result_Qualifier # "Result_Qualifier"
             real[10] <- "Final" # "Result_Status" 
             real[11] <- "Actual" # "Result_Type" 
             real[12] <- combined$Comments # "Result_Comment" 
