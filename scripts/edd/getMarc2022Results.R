@@ -10,11 +10,12 @@ getMarc2022Results <- function(marc2022, example, tlu_species){
             df <- marc2022
             df <- dplyr::left_join(df, tlu_species %>% select(-c(species_id)), by=c("common_name" = "Common_Name"))
             df$dummy <- paste0(df$SampleDate, df$Pass_ID, df$species_id)
+            df$Result_Qualifier <- paste0(df$SampleDate,";", df$Pass_ID)
             
             # there are three metrics to report:
             ### 1. Total length of individuals with != NA in df$TL_mm
             df_tl <- df %>% subset(!is.na(TL_mm))
-            df_tl$Characteristic_Name <- "Fish total length in mm"
+            df_tl$Characteristic_Name <- "Individual fish total length in mm"
             df_tl$Result_Unit <- "mm"
             df_tl$Result_Text <- df_tl$TL_mm
             
@@ -32,7 +33,7 @@ getMarc2022Results <- function(marc2022, example, tlu_species){
             
             ### 3. Weight of individuals with != NA in df$Wt_g
             df_wt <- df %>% subset(!is.na(Wt_g))
-            df_wt$Characteristic_Name <- "Fish weight (mass) in g"
+            df_wt$Characteristic_Name <- "Individual fish mass (weight) in g"
             df_wt$Result_Unit <- "g"
             df_wt$Result_Text <- df_wt$Wt_g
             #----- combine
@@ -50,7 +51,7 @@ getMarc2022Results <- function(marc2022, example, tlu_species){
             real[6] <- NA # "Result_Detection_Condition"
             real[7] <- df$Result_Text # "Result_Text"
             real[8] <- df$Result_Unit# "Result_Unit"
-            real[9] <- NA # "Result_Qualifier"
+            real[9] <- df$Result_Qualifier # "Result_Qualifier"
             real[10] <- "Final" # "Result_Status" 
             real[11] <- "Actual" # "Result_Type" 
             real[12] <- NA # "Result_Comment" 
