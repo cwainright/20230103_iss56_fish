@@ -1,12 +1,12 @@
 ---
-title: "Biological Stream Survey EDD"
+title: "Biological Stream Survey Electronic Data Deliverable"
 output: html_document
 date: "`r format(Sys.Date(), '%b %d, %Y')`"
 ---
 
 ## Overview
 
-The file `ncrn_edd_biological_stream_surveys_cumulative.xlsx` is an Excel workbook (hereafter "workbook") containing the cumulative biological stream survey data (hereafter "dataset") collected by USNPS National Capital Region Network (NCRN) and affiliates. This markdown document explains the contents of the workbook, the data model used to arrange the dataset, and provides general guidelines for interpreting the dataset.
+The file `ncrn_bss_edd_dataset_20230125.xlsx` is an Excel workbook (hereafter "workbook") containing the cumulative biological stream survey data (hereafter "dataset") collected by USNPS National Capital Region Network (NCRN) and affiliates. This markdown document explains the contents of the workbook, the data model used to arrange the dataset, and provides general guidelines for interpreting the dataset.
 
 This dataset synthesizes all available NCRN fish, water chemistry, and aquatic physical habitat inventory data into one file. Data are from five [sources](https://drive.google.com/drive/folders/1F7EeH3GUEGKzZ4YKU5wk7sfIj5sZpTqr?usp=share_link):  
 1. The NCRN [Biological Stream Survey (BSS) MS Access database](https://drive.google.com/file/d/1mk3eYkKNBLGjIvu647gKRX2YxEzMUQhN/view?usp=share_link). An entity relationship diagram of this database is available [here.](https://drive.google.com/file/d/1p2NOPA0MpxGPKWu-6KHlYDaRTtoNysei/view?usp=share_link)  
@@ -54,11 +54,11 @@ cols_na <- cols_na %>% group_by(only_na) %>% summarize(n=n())
 ```
 
 
-The dataset is provided in [electronic data deliverable (EDD) format](https://www.epa.gov/sites/default/files/2016-01/documents/r2comprehensivemanual_sept2015.pdf). The EDD contains three data views (`activities`, `results`, and `locations`). `results` are field observations like the count fishes captured in an electrofishing run, and lab results like total phosphorus concentration. `activities` and `locations` can be joined with `results` on `results.Activity_ID = activities.Activity_ID` and `activities.Location_ID = locations.Location_ID` to access supporting information about sampling instances and sampling sites, respectively.
+The dataset is provided in [electronic data deliverable (EDD) format](https://www.epa.gov/sites/default/files/2016-01/documents/r2comprehensivemanual_sept2015.pdf). The EDD contains three data views (`Activities`, `Results`, and `Locations`). `Results` are field observations like the count fishes captured in an electrofishing run, and lab results like total phosphorus concentration. `Activities` and `Locations` can be joined with `Results` on `Results.Activity_ID = Activities.Activity_ID` and `Activities.Location_ID = Locations.Location_ID` to access supporting information about sampling instances and sampling sites, respectively.
 
 ### Dataset overview
 
-Most of the columns in each data view (`results`, `locations`, and `activities`) contain only NAs. The abundance of NAs is a side-effect of making the EDD abstract-enough to accommodate any type of bio/geo/chemical data. For example, in `results`,  only `r cols_na[1,2]` of `r sum(cols_na$n)` have any non-NA values (Table 1).
+Most of the columns in each data view (`Results`, `Locations`, and `Activities`) contain only NAs. The abundance of NAs is a side-effect of making the EDD abstract-enough to accommodate any type of bio/geo/chemical data. For example, in `Results`,  only `r cols_na[1,2]` of `r sum(cols_na$n)` have any non-NA values (Table 1).
 
 ```{r, warning=FALSE}
 cols_na <- data.frame(col_name = colnames(EDD$Results),
@@ -75,15 +75,15 @@ cols_na %>%
     summary_rows(columns = n, fns = list(Total="sum"), decimals=0)
 ```
 
-#### __Data view `results`__
+#### __Data view `Results`__
 
-Generally, one row in `results` is one unique combination of `Activity_ID` and `Method_Speciation`.
+Generally, one row in `Results` is one unique combination of `Activity_ID` and `Method_Speciation`.
 
 ```{r}
 nrow(EDD$Results)
 uniqueN(EDD$Results, by=c("Activity_ID", "Method_Speciation"))
 ```
-One row in `results` is **not** a unique combination of `Activity_ID` and `Method_Speciation` when multiple measurements occurred from one activity-species combination, like if fishes were counted, and individual length and weight were measured for each of those fishes after a single electrofishing run (E.g., Table 2).
+One row in `Results` is **not** a unique combination of `Activity_ID` and `Method_Speciation` when multiple measurements occurred from one activity-species combination, like if fishes were counted, and individual length and weight were measured for each of those fishes after a single electrofishing run (e.g., Table 2).
 
 ```{r}
 summary_table <- EDD$Results %>%
@@ -95,43 +95,43 @@ summary_table <- EDD$Results %>%
     
 head(summary_table) %>%
     gt() %>%
-    tab_header(title="Table 2. Examples of repeated activity-species combinations in `results`.") %>%
+    tab_header(title="Table 2. Examples of repeated activity-species combinations in `Results`.") %>%
     cols_align(align = c("left"))
 ```
 
-Five columns from `results` will be especially important:   
+Five columns from `Results` will be especially important:   
 1. `Activity_ID`: The sampling event (e.g., an electrofishing run).  
 2. `Characteristic_Name`: The type of record (e.g., count of fishes from an electrofishing run).  
 3. `Method_Speciation`: The thing measured in a record (e.g., fish species).  
 4. `Result_Text`: The record's measurement (e.g., if a fish measured 55 mm TL, '55' would be its `Result_Text`).  
 5. `Result_Unit`: The record's unit of measure (e.g., if a fish measured 55 mm TL, 'mm' would be its `Result_Unit`).  
 
-The dataset contains five types of `results`. You will need to group and/or subset `results` by `EDD$Results$Characteristic_Name` for individual analyses.
+The dataset contains five types of `Results`. You will need to group and/or subset `Results` by `EDD$Results$Characteristic_Name` for individual analyses.
 ```{r}
 unique(EDD$Results$Characteristic_Name)
 ```
 
-#### __Data view `activities`__
+#### __Data view `Activities`__
 
-`activities` are samples and are usually associated with many records in `results`. In `R`, you can join `activities` and `results` like this:
+`Activities` are samples and are usually associated with many records in `Results`. In `R`, you can join `Activities` and `Results` like this:
 ```
-results.Activity_ID = activities.Activity_ID # equivalent fields
-demo_join <- dplyr::left_join(results, activities, by=c("Activity_ID")) # R dplyr example
+Results.Activity_ID = Activities.Activity_ID # equivalent fields
+demo_join <- dplyr::left_join(Results, Activities, by=c("Activity_ID")) # R dplyr example
 ```
-One row in `activities` is one sample event.
+One row in `Activities` is one sample event.
 ```{r}
 uniqueN(EDD$Activities, by=c("Activity_ID")) == nrow(EDD$Activities)
 ```
 
 
-#### __Data view `locations`__
-`locations` are sampling sites and are usually associated with many records in `activities`. In `R`, you can join `activities` and `locations` like this:
+#### __Data view `Locations`__
+`Locations` are sampling sites and are usually associated with many records in `Activities`. In `R`, you can join `Activities` and `Locations` like this:
 ```
-activities.Location_ID = locations.Location_ID # equivalent fields
-demo_join <- dplyr::left_join(activities, locations, by=c("Location_ID")) # R dplyr example
+Activities.Location_ID = Locations.Location_ID # equivalent fields
+demo_join <- dplyr::left_join(Activities, Locations, by=c("Location_ID")) # R dplyr example
 ```
 
-One row in `locations` is one sample location.
+One row in `Locations` is one sample location.
 ```{r}
 uniqueN(EDD$Locations, by=c("Location_ID")) == nrow(EDD$Locations)
 ```
