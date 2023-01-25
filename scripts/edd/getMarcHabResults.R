@@ -58,7 +58,7 @@ getMarcHabResults <- function(habitat_marc2022, habitat_marc2021, example, resul
 
             real[1] <- "NCRN" # "#Org_Code" 
             real[2] <- paste0(df$Activity_ID, "\\", df$Location_ID) # "Activity_ID"
-            real[3] <- "Stream habitat survey" # "Characteristic_Name"  
+            real[3] <- "Stream habitat inventory" # "Characteristic_Name"  
             real[4] <- df$variable # "Method_Speciation"
             real[5] <- NA # "Filtered_Fraction"
             real[6] <- NA # "Result_Detection_Condition"
