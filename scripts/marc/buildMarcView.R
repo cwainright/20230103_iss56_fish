@@ -80,7 +80,7 @@ buildMarc <- function(connection, write, addMarc){
             list_of_datasets <- list("by_pass" = pass, "individuals" = indiv) # list object that can be saved as xlsx
             if(length(list_of_datasets)==2){
                 if(nrow(list_of_datasets[[1]]>0) & nrow(list_of_datasets[[2]]>0)){
-                    message("\n\n`buildMarc() successfully produced data views.\nOutput saved as `marc_views` in global environment.\n\n")
+                    message("\n\n`buildMarc()` successfully produced data views.\nOutput saved as `marc_views` in global environment.\n\n")
                     assign("marc_views", list_of_datasets, envir = globalenv()) # save final product to global environment
                 }
             } else {
