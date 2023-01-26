@@ -16,7 +16,8 @@ getNCRNFishResults <- function(results_list, example){
             df$Result_Unit <- "count of individuals"
             df <- dplyr::left_join(df, results_list$tlu_Fish %>% select(Latin_Name, Common_Name), by = c("Fish_Species" = "Latin_Name"))
             df <- rename(df, species = Fish_Species)
-            df$Result_Qualifier <- "Electofishing pass 1"
+            df$Result_Qualifier <- "Electrofishing pass 1"
+            df$Fish_Event_ID <- paste0(df$Fish_Event_ID, ",", "pass_1")
             
             df2 <- results_list$tbl_Fish_Data
             df2$Characteristic_Name <- "Fish count by species"
@@ -24,7 +25,8 @@ getNCRNFishResults <- function(results_list, example){
             df2$Result_Unit <- "count of individuals"
             df2 <- dplyr::left_join(df2, results_list$tlu_Fish %>% select(Latin_Name, Common_Name), by = c("Fish_Species" = "Latin_Name"))
             df2 <- rename(df2, species = Fish_Species)
-            df2$Result_Qualifier <- "Electofishing pass 2"
+            df2$Result_Qualifier <- "Electrofishing pass 2"
+            df2$Fish_Event_ID <- paste0(df2$Fish_Event_ID, ",", "pass_2")
             
             df <- rbind(df, df2)
             

@@ -17,10 +17,23 @@ getNCRNFishActivities <- function(results_list, example){
             df <- dplyr::left_join(df, results_list$tbl_Locations %>% select(Location_ID, Loc_Name, NCRN_Site_ID), by = "Location_ID")
             df2 <- results_list$tbl_Electro_Fish_Details %>% dplyr::distinct(Fish_Event_ID, .keep_all = TRUE)
             df <- dplyr::left_join(df, df2 %>% select(Fish_Event_ID, Pass_1_Start, Pass_1_End, Pass_2_Start, Pass_2_End), by = "Fish_Event_ID")
+            df2 <- df %>% select(-c(Pass_1_Start, Pass_1_End)) # make a copy to use for pass 2
+            df <- df %>% select(-c(Pass_2_Start, Pass_2_End))
+            # make one row one pass to match Marc's format
+            # pass1
+            data.table::setnames(df, "Pass_1_Start", "Pass_Start_seconds")
+            data.table::setnames(df, "Pass_1_End", "Pass_End_seconds")
+            df$Fish_Event_ID <- paste0(df$Fish_Event_ID, ",", "pass_2")
+            # pass2
+            data.table::setnames(df2, "Pass_2_Start", "Pass_Start_seconds")
+            data.table::setnames(df2, "Pass_2_End", "Pass_End_seconds")
+            df2$Fish_Event_ID <- paste0(df2$Fish_Event_ID, ",", "pass_2")
+            #combine
+            df <- rbind(df, df2)
             
             #----- re-build `example` from `results_list`
             # starting point: copy the example dataframe but without data
-            real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(results_list$tbl_Fish_Events)))) # empty dataframe
+            real <- tibble::tibble(data.frame(matrix(ncol = ncol(example), nrow = nrow(df)))) # empty dataframe
             colnames(real) <- colnames(example) # name columns to match example
             
             real[1] <- "NCRN" # "#Org_Code" 
@@ -119,18 +132,11 @@ getNCRNFishActivities <- function(results_list, example){
             # we need to account for possible NA values since we're doing math
             # we need to only do math if we have a valid start & end pair (i.e., use either pass 2 or pass 1 if only one pair is NA-free)
             # if we have two valid start & end pairs, use both and sum them
-            for (i in 1:nrow(real)){
-                # scenario 1: Pass 1 has 2 NA-free values but there's a NA in Pass 2
-                if(!is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i]) & is.na(df$Pass_2_End[i]) | is.na(df$Pass_2_Start[i])){
-                    real[i,62] <- (df$Pass_1_End[i]-df$Pass_1_Start[i])
-                }
-                # scenario 2: Pass 2 has 2 NA-free values but there's a NA in Pass 1 
-                else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & is.na(df$Pass_1_End[i]) | is.na(df$Pass_1_Start[i])){
-                    real[i,62] <- (df$Pass_2_End[i]-df$Pass_2_Start[i])
-                }
-                # scenario 3: Both Pass 1 and Pass 2 are NA-free
-                else if(!is.na(df$Pass_2_End[i]) & !is.na(df$Pass_2_Start[i]) & !is.na(df$Pass_1_End[i]) & !is.na(df$Pass_1_Start[i])){
-                    real[i,62] <- ((df$Pass_2_End[i]-df$Pass_2_Start[i]) + (df$Pass_1_End[i]-df$Pass_1_Start[i]))
+            for(i in 1:nrow(real)){
+                if(!is.na(df$Pass_End_seconds[i]) & !is.na(df$Pass_Start_seconds[i])){
+                    real[i,62] <- (df$Pass_End_seconds[i]-df$Pass_Start_seconds[i])
+                } else {
+                    real[i,62] <- NA
                 }
             }
             # "Effort_Unit"
