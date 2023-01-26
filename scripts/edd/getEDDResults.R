@@ -11,7 +11,7 @@ getEDDResults <- function(results_list, marc2022, marc2021, habitat_marc2021, ha
             
             #----- load project functions
             source("scripts/edd/getMarc2022Results.R")
-            source("scripts/edd/getMarc2021Results.R")
+            # source("scripts/edd/getMarc2021Results.R")
             source("scripts/edd/getMarcHabResults.R")
             source("scripts/edd/buildLookup.R")
             source("scripts/edd/getNCRNFishResults.R")
@@ -33,10 +33,10 @@ getEDDResults <- function(results_list, marc2022, marc2021, habitat_marc2021, ha
                 tlu_species <- buildLookup(marc2022, results_list)
                 # run marc results modules
                 marc2022_results <- getMarc2022Results(marc2022, example, tlu_species)
-                marc2021_results <- getMarc2021Results(marc2021, example, tlu_species)
+                # marc2021_results <- getMarc2021Results(marc2021, example, tlu_species)
                 marc_habitat_results <- getMarcHabResults(habitat_marc2022, habitat_marc2021, example, results_list)
                 # combine
-                real <- rbind(real, marc2022_results, marc2021_results, marc_habitat_results)
+                real <- rbind(real, marc2022_results, marc_habitat_results)
             }
             
             # error-checking:

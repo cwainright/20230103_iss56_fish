@@ -44,7 +44,7 @@ getMarc2021Results <- function(marc2021, example, tlu_species){
             colnames(real) <- colnames(example) # name columns to match example
             
             real[1] <- "NCRN" # "#Org_Code" 
-            real[2] <- df$FishObsID # "Activity_ID"
+            real[2] <- df$Pass_ID # "Activity_ID"
             real[3] <- df$Characteristic_Name# "Characteristic_Name"  
             real[4] <- df$Species_ID # "Method_Speciation"
             real[5] <- NA # "Filtered_Fraction"
@@ -75,7 +75,7 @@ getMarc2021Results <- function(marc2021, example, tlu_species){
             real[30] <- NA # "Result_Depth_Altitude_Reference_Point"
             real[31] <- NA # "Analytical_Method_ID"
             real[32] <- NA # "Analytical_Remark"
-            real[33] <- NA # "Lab_ID"
+            real[33] <- df$FishObsID # "Lab_ID"
             real[34] <- NA # "Lab_Remark_Code"
             real[35] <- format(as.Date(df$SampleDate), "%Y-%m-%d") # "Analysis_Start_Date"
             real[36] <- format(as.Date(df$SampleDate), "%H:%M") # "Analysis_Start_Time" 
