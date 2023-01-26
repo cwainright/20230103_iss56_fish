@@ -54,7 +54,7 @@ cols_na <- cols_na %>% group_by(only_na) %>% summarize(n=n())
 ```
 
 
-The dataset is provided in [electronic data deliverable (EDD) format](https://www.epa.gov/sites/default/files/2016-01/documents/r2comprehensivemanual_sept2015.pdf). The EDD contains three data views (`Activities`, `Results`, and `Locations`). `Results` are field observations like the count fishes captured in an electrofishing run, and lab results like total phosphorus concentration. `Activities` and `Locations` can be joined with `Results` on `Results.Activity_ID = Activities.Activity_ID` and `Activities.Location_ID = Locations.Location_ID` to access supporting information about sampling instances and sampling sites, respectively.
+The dataset is provided in [electronic data deliverable (EDD) format](https://www.epa.gov/sites/default/files/2016-01/documents/r2comprehensivemanual_sept2015.pdf). The EDD contains three data views (`Activities`, `Results`, and `Locations`). `Results` are field observations like the count fishes captured in an electrofishing pass, and lab results like total phosphorus concentration. `Activities` and `Locations` can be joined with `Results` on `Results.Activity_ID = Activities.Activity_ID` and `Activities.Location_ID = Locations.Location_ID` to access supporting information about sampling instances and sampling sites, respectively.
 
 ### Dataset overview
 
@@ -83,7 +83,7 @@ Generally, one row in `Results` is one unique combination of `Activity_ID` and `
 nrow(EDD$Results)
 uniqueN(EDD$Results, by=c("Activity_ID", "Method_Speciation"))
 ```
-One row in `Results` is **not** a unique combination of `Activity_ID` and `Method_Speciation` when multiple measurements occurred from one activity-species combination, like if fishes were counted, and individual length and weight were measured for each of those fishes after a single electrofishing run (e.g., Table 2).
+One row in `Results` is **not** a unique combination of `Activity_ID` and `Method_Speciation` when multiple measurements occurred from one activity-species combination, like if fishes were counted, and individual length and weight were measured for each of those fishes after a single electrofishing pass (e.g., Table 2).
 
 ```{r}
 summary_table <- EDD$Results %>%
@@ -100,8 +100,8 @@ head(summary_table) %>%
 ```
 
 Five columns from `Results` will be especially important:   
-1. `Activity_ID`: The sampling event (e.g., an electrofishing run).  
-2. `Characteristic_Name`: The type of record (e.g., count of fishes from an electrofishing run).  
+1. `Activity_ID`: The sampling event (e.g., an electrofishing pass).  
+2. `Characteristic_Name`: The type of record (e.g., count of fishes from an electrofishing pass).  
 3. `Method_Speciation`: The thing measured in a record (e.g., fish species).  
 4. `Result_Text`: The record's measurement (e.g., if a fish measured 55 mm TL, '55' would be its `Result_Text`).  
 5. `Result_Unit`: The record's unit of measure (e.g., if a fish measured 55 mm TL, 'mm' would be its `Result_Unit`).  
@@ -118,7 +118,7 @@ unique(EDD$Results$Characteristic_Name)
 Results.Activity_ID = Activities.Activity_ID # equivalent fields
 demo_join <- dplyr::left_join(Results, Activities, by=c("Activity_ID")) # R dplyr example
 ```
-One row in `Activities` is one sample event.
+One row in `Activities` is one sample event (e.g., an electrofishing pass).
 ```{r}
 uniqueN(EDD$Activities, by=c("Activity_ID")) == nrow(EDD$Activities)
 ```

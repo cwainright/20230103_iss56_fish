@@ -356,7 +356,7 @@ pre code {
 
 <h1 class="title toc-ignore">Biological Stream Survey Electronic Data
 Deliverable</h1>
-<h4 class="date">Jan 25, 2023</h4>
+<h4 class="date">Jan 26, 2023</h4>
 
 </div>
 
@@ -402,8 +402,8 @@ from <code>scripts/main.R</code> to reproduce the dataset.</p>
 data deliverable (EDD) format</a>. The EDD contains three data views
 (<code>Activities</code>, <code>Results</code>, and
 <code>Locations</code>). <code>Results</code> are field observations
-like the count fishes captured in an electrofishing run, and lab results
-like total phosphorus concentration. <code>Activities</code> and
+like the count fishes captured in an electrofishing pass, and lab
+results like total phosphorus concentration. <code>Activities</code> and
 <code>Locations</code> can be joined with <code>Results</code> on
 <code>Results.Activity_ID = Activities.Activity_ID</code> and
 <code>Activities.Location_ID = Locations.Location_ID</code> to access
@@ -416,7 +416,7 @@ respectively.</p>
 <code>Locations</code>, and <code>Activities</code>) contain only NAs.
 The abundance of NAs is a side-effect of making the EDD abstract-enough
 to accommodate any type of bio/geo/chemical data. For example, in
-<code>Results</code>, only 14 of 89 have any non-NA values (Table
+<code>Results</code>, only 10 of 89 have any non-NA values (Table
 1).</p>
 <pre class="r"><code>cols_na &lt;- data.frame(col_name = colnames(EDD$Results),
                       only_na = NA)
@@ -430,12 +430,12 @@ cols_na %&gt;%
     tab_header(title=&quot;Table 1. Count of columns in `EDD$Results` with NA and non-NA values.&quot;) %&gt;%
     cols_label(only_na = &quot;Columns contain only NA&quot;) %&gt;%
     summary_rows(columns = n, fns = list(Total=&quot;sum&quot;), decimals=0)</code></pre>
-<div id="wtcedzdfbe" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="dtxstqirkt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#wtcedzdfbe .gt_table {
+#dtxstqirkt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -460,7 +460,7 @@ cols_na %&gt;%
   border-left-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_heading {
+#dtxstqirkt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -472,12 +472,12 @@ cols_na %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_caption {
+#dtxstqirkt .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#wtcedzdfbe .gt_title {
+#dtxstqirkt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -489,7 +489,7 @@ cols_na %&gt;%
   border-bottom-width: 0;
 }
 
-#wtcedzdfbe .gt_subtitle {
+#dtxstqirkt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -501,13 +501,13 @@ cols_na %&gt;%
   border-top-width: 0;
 }
 
-#wtcedzdfbe .gt_bottom_border {
+#dtxstqirkt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_col_headings {
+#dtxstqirkt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -522,7 +522,7 @@ cols_na %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_col_heading {
+#dtxstqirkt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -542,7 +542,7 @@ cols_na %&gt;%
   overflow-x: hidden;
 }
 
-#wtcedzdfbe .gt_column_spanner_outer {
+#dtxstqirkt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -554,15 +554,15 @@ cols_na %&gt;%
   padding-right: 4px;
 }
 
-#wtcedzdfbe .gt_column_spanner_outer:first-child {
+#dtxstqirkt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#wtcedzdfbe .gt_column_spanner_outer:last-child {
+#dtxstqirkt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#wtcedzdfbe .gt_column_spanner {
+#dtxstqirkt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -574,7 +574,7 @@ cols_na %&gt;%
   width: 100%;
 }
 
-#wtcedzdfbe .gt_group_heading {
+#dtxstqirkt .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -600,7 +600,7 @@ cols_na %&gt;%
   text-align: left;
 }
 
-#wtcedzdfbe .gt_empty_group_heading {
+#dtxstqirkt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -615,15 +615,15 @@ cols_na %&gt;%
   vertical-align: middle;
 }
 
-#wtcedzdfbe .gt_from_md > :first-child {
+#dtxstqirkt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#wtcedzdfbe .gt_from_md > :last-child {
+#dtxstqirkt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#wtcedzdfbe .gt_row {
+#dtxstqirkt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -642,7 +642,7 @@ cols_na %&gt;%
   overflow-x: hidden;
 }
 
-#wtcedzdfbe .gt_stub {
+#dtxstqirkt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -655,7 +655,7 @@ cols_na %&gt;%
   padding-right: 5px;
 }
 
-#wtcedzdfbe .gt_stub_row_group {
+#dtxstqirkt .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -669,11 +669,11 @@ cols_na %&gt;%
   vertical-align: top;
 }
 
-#wtcedzdfbe .gt_row_group_first td {
+#dtxstqirkt .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#wtcedzdfbe .gt_summary_row {
+#dtxstqirkt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -683,16 +683,16 @@ cols_na %&gt;%
   padding-right: 5px;
 }
 
-#wtcedzdfbe .gt_first_summary_row {
+#dtxstqirkt .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_first_summary_row.thick {
+#dtxstqirkt .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#wtcedzdfbe .gt_last_summary_row {
+#dtxstqirkt .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -702,7 +702,7 @@ cols_na %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_grand_summary_row {
+#dtxstqirkt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -712,7 +712,7 @@ cols_na %&gt;%
   padding-right: 5px;
 }
 
-#wtcedzdfbe .gt_first_grand_summary_row {
+#dtxstqirkt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -722,11 +722,11 @@ cols_na %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_striped {
+#dtxstqirkt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#wtcedzdfbe .gt_table_body {
+#dtxstqirkt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -735,7 +735,7 @@ cols_na %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_footnotes {
+#dtxstqirkt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -749,7 +749,7 @@ cols_na %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_footnote {
+#dtxstqirkt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -758,7 +758,7 @@ cols_na %&gt;%
   padding-right: 5px;
 }
 
-#wtcedzdfbe .gt_sourcenotes {
+#dtxstqirkt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -772,7 +772,7 @@ cols_na %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#wtcedzdfbe .gt_sourcenote {
+#dtxstqirkt .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -780,64 +780,64 @@ cols_na %&gt;%
   padding-right: 5px;
 }
 
-#wtcedzdfbe .gt_left {
+#dtxstqirkt .gt_left {
   text-align: left;
 }
 
-#wtcedzdfbe .gt_center {
+#dtxstqirkt .gt_center {
   text-align: center;
 }
 
-#wtcedzdfbe .gt_right {
+#dtxstqirkt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wtcedzdfbe .gt_font_normal {
+#dtxstqirkt .gt_font_normal {
   font-weight: normal;
 }
 
-#wtcedzdfbe .gt_font_bold {
+#dtxstqirkt .gt_font_bold {
   font-weight: bold;
 }
 
-#wtcedzdfbe .gt_font_italic {
+#dtxstqirkt .gt_font_italic {
   font-style: italic;
 }
 
-#wtcedzdfbe .gt_super {
+#dtxstqirkt .gt_super {
   font-size: 65%;
 }
 
-#wtcedzdfbe .gt_footnote_marks {
+#dtxstqirkt .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#wtcedzdfbe .gt_asterisk {
+#dtxstqirkt .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#wtcedzdfbe .gt_indent_1 {
+#dtxstqirkt .gt_indent_1 {
   text-indent: 5px;
 }
 
-#wtcedzdfbe .gt_indent_2 {
+#dtxstqirkt .gt_indent_2 {
   text-indent: 10px;
 }
 
-#wtcedzdfbe .gt_indent_3 {
+#dtxstqirkt .gt_indent_3 {
   text-indent: 15px;
 }
 
-#wtcedzdfbe .gt_indent_4 {
+#dtxstqirkt .gt_indent_4 {
   text-indent: 20px;
 }
 
-#wtcedzdfbe .gt_indent_5 {
+#dtxstqirkt .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -858,10 +858,10 @@ cols_na %&gt;%
   <tbody class="gt_table_body">
     <tr><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub"></th>
 <td headers="stub_1_1 only_na" class="gt_row gt_center">FALSE</td>
-<td headers="stub_1_1 n" class="gt_row gt_right">14</td></tr>
+<td headers="stub_1_1 n" class="gt_row gt_right">10</td></tr>
     <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub"></th>
 <td headers="stub_1_2 only_na" class="gt_row gt_center">TRUE</td>
-<td headers="stub_1_2 n" class="gt_row gt_right">75</td></tr>
+<td headers="stub_1_2 n" class="gt_row gt_right">79</td></tr>
     <tr><th id="grand_summary_stub_1" scope="row" class="gt_row gt_left gt_stub gt_grand_summary_row gt_first_grand_summary_row gt_last_summary_row">Total</th>
 <td headers="grand_summary_stub_1 only_na" class="gt_row gt_center gt_grand_summary_row gt_first_grand_summary_row gt_last_summary_row">—</td>
 <td headers="grand_summary_stub_1 n" class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row gt_last_summary_row">89</td></tr>
@@ -875,15 +875,15 @@ cols_na %&gt;%
 <p>Generally, one row in <code>Results</code> is one unique combination
 of <code>Activity_ID</code> and <code>Method_Speciation</code>.</p>
 <pre class="r"><code>nrow(EDD$Results)</code></pre>
-<pre><code>## [1] 29552</code></pre>
+<pre><code>## [1] 28391</code></pre>
 <pre class="r"><code>uniqueN(EDD$Results, by=c(&quot;Activity_ID&quot;, &quot;Method_Speciation&quot;))</code></pre>
-<pre><code>## [1] 25249</code></pre>
+<pre><code>## [1] 18899</code></pre>
 <p>One row in <code>Results</code> is <strong>not</strong> a unique
 combination of <code>Activity_ID</code> and
 <code>Method_Speciation</code> when multiple measurements occurred from
 one activity-species combination, like if fishes were counted, and
 individual length and weight were measured for each of those fishes
-after a single electrofishing run (e.g., Table 2).</p>
+after a single electrofishing pass (e.g., Table 2).</p>
 <pre class="r"><code>summary_table &lt;- EDD$Results %&gt;%
     subset(Characteristic_Name %in% c(&quot;Fish count by species&quot;, &quot;Individual fish total length in mm&quot;, &quot;Individual fish mass (weight) in g&quot;)) %&gt;%
     group_by(Activity_ID, Method_Speciation) %&gt;% 
@@ -896,12 +896,12 @@ after a single electrofishing run (e.g., Table 2).</p>
     gt() %&gt;%
     tab_header(title=&quot;Table 2. Examples of repeated activity-species combinations in `Results`.&quot;) %&gt;%
     cols_align(align = c(&quot;left&quot;))</code></pre>
-<div id="ardimjxaoz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="yvlnmlknzz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ardimjxaoz .gt_table {
+#yvlnmlknzz .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -926,7 +926,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-left-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_heading {
+#yvlnmlknzz .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -938,12 +938,12 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-right-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_caption {
+#yvlnmlknzz .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ardimjxaoz .gt_title {
+#yvlnmlknzz .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -955,7 +955,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-bottom-width: 0;
 }
 
-#ardimjxaoz .gt_subtitle {
+#yvlnmlknzz .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -967,13 +967,13 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-top-width: 0;
 }
 
-#ardimjxaoz .gt_bottom_border {
+#yvlnmlknzz .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_col_headings {
+#yvlnmlknzz .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -988,7 +988,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-right-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_col_heading {
+#yvlnmlknzz .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1008,7 +1008,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   overflow-x: hidden;
 }
 
-#ardimjxaoz .gt_column_spanner_outer {
+#yvlnmlknzz .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1020,15 +1020,15 @@ after a single electrofishing run (e.g., Table 2).</p>
   padding-right: 4px;
 }
 
-#ardimjxaoz .gt_column_spanner_outer:first-child {
+#yvlnmlknzz .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ardimjxaoz .gt_column_spanner_outer:last-child {
+#yvlnmlknzz .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ardimjxaoz .gt_column_spanner {
+#yvlnmlknzz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1040,7 +1040,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   width: 100%;
 }
 
-#ardimjxaoz .gt_group_heading {
+#yvlnmlknzz .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1066,7 +1066,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   text-align: left;
 }
 
-#ardimjxaoz .gt_empty_group_heading {
+#yvlnmlknzz .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1081,15 +1081,15 @@ after a single electrofishing run (e.g., Table 2).</p>
   vertical-align: middle;
 }
 
-#ardimjxaoz .gt_from_md > :first-child {
+#yvlnmlknzz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ardimjxaoz .gt_from_md > :last-child {
+#yvlnmlknzz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ardimjxaoz .gt_row {
+#yvlnmlknzz .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1108,7 +1108,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   overflow-x: hidden;
 }
 
-#ardimjxaoz .gt_stub {
+#yvlnmlknzz .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1121,7 +1121,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   padding-right: 5px;
 }
 
-#ardimjxaoz .gt_stub_row_group {
+#yvlnmlknzz .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1135,11 +1135,11 @@ after a single electrofishing run (e.g., Table 2).</p>
   vertical-align: top;
 }
 
-#ardimjxaoz .gt_row_group_first td {
+#yvlnmlknzz .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ardimjxaoz .gt_summary_row {
+#yvlnmlknzz .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1149,16 +1149,16 @@ after a single electrofishing run (e.g., Table 2).</p>
   padding-right: 5px;
 }
 
-#ardimjxaoz .gt_first_summary_row {
+#yvlnmlknzz .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_first_summary_row.thick {
+#yvlnmlknzz .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ardimjxaoz .gt_last_summary_row {
+#yvlnmlknzz .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1168,7 +1168,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_grand_summary_row {
+#yvlnmlknzz .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1178,7 +1178,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   padding-right: 5px;
 }
 
-#ardimjxaoz .gt_first_grand_summary_row {
+#yvlnmlknzz .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1188,11 +1188,11 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-top-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_striped {
+#yvlnmlknzz .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ardimjxaoz .gt_table_body {
+#yvlnmlknzz .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1201,7 +1201,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_footnotes {
+#yvlnmlknzz .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1215,7 +1215,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-right-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_footnote {
+#yvlnmlknzz .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1224,7 +1224,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   padding-right: 5px;
 }
 
-#ardimjxaoz .gt_sourcenotes {
+#yvlnmlknzz .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1238,7 +1238,7 @@ after a single electrofishing run (e.g., Table 2).</p>
   border-right-color: #D3D3D3;
 }
 
-#ardimjxaoz .gt_sourcenote {
+#yvlnmlknzz .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1246,64 +1246,64 @@ after a single electrofishing run (e.g., Table 2).</p>
   padding-right: 5px;
 }
 
-#ardimjxaoz .gt_left {
+#yvlnmlknzz .gt_left {
   text-align: left;
 }
 
-#ardimjxaoz .gt_center {
+#yvlnmlknzz .gt_center {
   text-align: center;
 }
 
-#ardimjxaoz .gt_right {
+#yvlnmlknzz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ardimjxaoz .gt_font_normal {
+#yvlnmlknzz .gt_font_normal {
   font-weight: normal;
 }
 
-#ardimjxaoz .gt_font_bold {
+#yvlnmlknzz .gt_font_bold {
   font-weight: bold;
 }
 
-#ardimjxaoz .gt_font_italic {
+#yvlnmlknzz .gt_font_italic {
   font-style: italic;
 }
 
-#ardimjxaoz .gt_super {
+#yvlnmlknzz .gt_super {
   font-size: 65%;
 }
 
-#ardimjxaoz .gt_footnote_marks {
+#yvlnmlknzz .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#ardimjxaoz .gt_asterisk {
+#yvlnmlknzz .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ardimjxaoz .gt_indent_1 {
+#yvlnmlknzz .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ardimjxaoz .gt_indent_2 {
+#yvlnmlknzz .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ardimjxaoz .gt_indent_3 {
+#yvlnmlknzz .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ardimjxaoz .gt_indent_4 {
+#yvlnmlknzz .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ardimjxaoz .gt_indent_5 {
+#yvlnmlknzz .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1322,24 +1322,24 @@ after a single electrofishing run (e.g., Table 2).</p>
     </tr>
   </thead>
   <tbody class="gt_table_body">
-    <tr><td headers="Activity_ID" class="gt_row gt_left">20100616115143-474459171.295166</td>
-<td headers="Method_Speciation" class="gt_row gt_left">brown trout</td>
-<td headers="n" class="gt_row gt_left">52</td></tr>
-    <tr><td headers="Activity_ID" class="gt_row gt_left">20100925143209-575183808.803558</td>
-<td headers="Method_Speciation" class="gt_row gt_left">brook trout</td>
-<td headers="n" class="gt_row gt_left">21</td></tr>
-    <tr><td headers="Activity_ID" class="gt_row gt_left">20100925144758-257267653.942108</td>
-<td headers="Method_Speciation" class="gt_row gt_left">brook trout</td>
-<td headers="n" class="gt_row gt_left">17</td></tr>
-    <tr><td headers="Activity_ID" class="gt_row gt_left">20101027162759-404834151.268005</td>
-<td headers="Method_Speciation" class="gt_row gt_left">largemouth bass</td>
-<td headers="n" class="gt_row gt_left">16</td></tr>
-    <tr><td headers="Activity_ID" class="gt_row gt_left">20101027113224-524868428.707123</td>
-<td headers="Method_Speciation" class="gt_row gt_left">largemouth bass</td>
-<td headers="n" class="gt_row gt_left">12</td></tr>
-    <tr><td headers="Activity_ID" class="gt_row gt_left">20101028115632-678913354.873657</td>
-<td headers="Method_Speciation" class="gt_row gt_left">rainbow trout</td>
-<td headers="n" class="gt_row gt_left">10</td></tr>
+    <tr><td headers="Activity_ID" class="gt_row gt_left">Pass-2109</td>
+<td headers="Method_Speciation" class="gt_row gt_left">blacknose dace</td>
+<td headers="n" class="gt_row gt_left">359</td></tr>
+    <tr><td headers="Activity_ID" class="gt_row gt_left">Pass-2139</td>
+<td headers="Method_Speciation" class="gt_row gt_left">checkered sculpin</td>
+<td headers="n" class="gt_row gt_left">351</td></tr>
+    <tr><td headers="Activity_ID" class="gt_row gt_left">Pass-2128</td>
+<td headers="Method_Speciation" class="gt_row gt_left">banded killifish</td>
+<td headers="n" class="gt_row gt_left">252</td></tr>
+    <tr><td headers="Activity_ID" class="gt_row gt_left">Pass-2109</td>
+<td headers="Method_Speciation" class="gt_row gt_left">blue ridge sculpin</td>
+<td headers="n" class="gt_row gt_left">236</td></tr>
+    <tr><td headers="Activity_ID" class="gt_row gt_left">Pass-2128</td>
+<td headers="Method_Speciation" class="gt_row gt_left">e. silvery minnow</td>
+<td headers="n" class="gt_row gt_left">233</td></tr>
+    <tr><td headers="Activity_ID" class="gt_row gt_left">Pass-2126</td>
+<td headers="Method_Speciation" class="gt_row gt_left">blacknose dace</td>
+<td headers="n" class="gt_row gt_left">224</td></tr>
   </tbody>
   
   
@@ -1348,9 +1348,9 @@ after a single electrofishing run (e.g., Table 2).</p>
 <p>Five columns from <code>Results</code> will be especially
 important:<br />
 1. <code>Activity_ID</code>: The sampling event (e.g., an electrofishing
-run).<br />
+pass).<br />
 2. <code>Characteristic_Name</code>: The type of record (e.g., count of
-fishes from an electrofishing run).<br />
+fishes from an electrofishing pass).<br />
 3. <code>Method_Speciation</code>: The thing measured in a record (e.g.,
 fish species).<br />
 4. <code>Result_Text</code>: The record’s measurement (e.g., if a fish
@@ -1373,7 +1373,8 @@ many records in <code>Results</code>. In <code>R</code>, you can join
 <code>Activities</code> and <code>Results</code> like this:</p>
 <pre><code>Results.Activity_ID = Activities.Activity_ID # equivalent fields
 demo_join &lt;- dplyr::left_join(Results, Activities, by=c(&quot;Activity_ID&quot;)) # R dplyr example</code></pre>
-<p>One row in <code>Activities</code> is one sample event.</p>
+<p>One row in <code>Activities</code> is one sample event (e.g., an
+electrofishing pass).</p>
 <pre class="r"><code>uniqueN(EDD$Activities, by=c(&quot;Activity_ID&quot;)) == nrow(EDD$Activities)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 </div>
