@@ -100,7 +100,7 @@ getNCRNHabActivities <- function(results_list, example){
             real[61] <- NA # "Toxicity_Test_Type"
             real[62] <- NA # "Effort"
             real[63] <- NA # "Effort_Unit"
-            real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            real <- as.data.frame(lapply(real, function(y) gsub("\\<NA\\>", NA, y))) # remove "NA" chr strings
             colnames(real)[1] <- "#Org_Code"
             # test <- cbind(real_activities[62:63], df$Pass_1_End, df$Pass_1_Start, df$Pass_2_End, df$Pass_2_Start) # check the `$Effort` math in real[62]
             

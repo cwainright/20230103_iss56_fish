@@ -117,7 +117,7 @@ getMarc2022Activities <- function(marc2022, example){
             acts[61] <- NA # "Toxicity_Test_Type"
             acts[62] <- NA # "Effort"
             acts[63] <- NA # "Effort_Unit"
-            acts <- as.data.frame(lapply(acts, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            acts <- as.data.frame(lapply(acts, function(y) gsub("\\<NA\\>", NA, y))) # remove "NA" chr strings
             colnames(acts)[1] <- "#Org_Code"
             # pass2022[32] <- '"data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData"' # Source
                 

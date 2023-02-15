@@ -133,7 +133,7 @@ getMarc2022Results <- function(marc2022, example, tlu_species){
             real[88] <- NA # "Taxonomist_Accreditation_Authority_Name"
             real[89] <- NA # "Result_File_Name"
             
-            real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            real <- as.data.frame(lapply(real, function(y) gsub("\\<NA\\>", NA, y))) # remove "NA" chr strings
             colnames(real)[1] <- "#Org_Code"
             # indiv[32] <- '"data/NCRN_BSS_Fish_Monitoring_Data_2022_Marc.xlsx", sheet = "ElectrofishingData"'
 

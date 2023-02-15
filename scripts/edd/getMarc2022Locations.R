@@ -74,7 +74,7 @@ getMarc2022Locations <- function(marc2022, example, results_list){
             real[41] <- NA # "Well_Hole_Depth_Unit"
             real[42] <- NA # "Well_Status"
             
-            real <- as.data.frame(lapply(real, function(y) gsub("NA", NA, y))) # remove "NA" chr strings
+            real <- as.data.frame(lapply(real, function(y) gsub("\\<NA\\>", NA, y))) # remove "NA" chr strings
             colnames(real)[1] <- "#Org_Code"
             
             # error-checking:
