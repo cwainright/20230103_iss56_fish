@@ -18,8 +18,8 @@ getNCRNHabLocations <- function(results_list, example){
             df_spring <- dplyr::left_join(df_spring, results_list$tbl_Meta_Events %>% select(Event_ID, Entered_by), by = "Event_ID")
             df_spring <- dplyr::left_join(df_spring, results_list$tbl_Locations %>% select(Location_ID, Loc_Name, NCRN_Site_ID, Unit_Code, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24,
                                                                              Elevation, State, County, Catchment_Area), by = "Location_ID")
-            df_spring <- df_spring %>% distinct(Location_ID, .keep_all = TRUE)
-            df_spring <- df_spring %>% select(Unit_Code, Location_ID, Loc_Name, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24, Elevation, State, County, Catchment_Area)
+            df_spring <- df_spring %>% distinct(NCRN_Site_ID, .keep_all = TRUE)
+            df_spring <- df_spring %>% select(Unit_Code, NCRN_Site_ID, Location_ID, Loc_Name, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24, Elevation, State, County, Catchment_Area)
             
             
             df_summer <- results_list$tbl_Summer_PHI %>% dplyr::distinct(Summer_PHI_ID, .keep_all = TRUE) %>%
@@ -30,8 +30,8 @@ getNCRNHabLocations <- function(results_list, example){
             df_summer <- dplyr::left_join(df_summer, results_list$tbl_Meta_Events %>% select(Event_ID, Entered_by), by = "Event_ID")
             df_summer <- dplyr::left_join(df_summer, results_list$tbl_Locations %>% select(Location_ID, Loc_Name, NCRN_Site_ID, Unit_Code, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24,
                                                                                            Elevation, State, County, Catchment_Area), by = "Location_ID")
-            df_summer <- df_summer %>% distinct(Location_ID, .keep_all = TRUE)
-            df_summer <- df_summer %>% select(Unit_Code, Location_ID, Loc_Name, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24, Elevation, State, County, Catchment_Area)
+            df_summer <- df_summer %>% distinct(NCRN_Site_ID, .keep_all = TRUE)
+            df_summer <- df_summer %>% select(Unit_Code, NCRN_Site_ID, Location_ID, Loc_Name, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24, Elevation, State, County, Catchment_Area)
             
             df <- rbind(df_spring, df_summer)
             #----- re-build `example` from `results_list`
@@ -41,7 +41,7 @@ getNCRNHabLocations <- function(results_list, example){
             
             real[1] <- "NCRN" # "#Org_Code"
             real[2] <- df$Unit_Code # "Park_Code" 
-            real[3] <- df$Location_ID # "Location_ID" shared field with `real_activities.Location_ID`
+            real[3] <- df$NCRN_Site_ID # "Location_ID" shared field with `real_activities.Location_ID`
             real[4] <- df$Loc_Name # "Location_Name"
             real[5] <- "Creek" # "Location_Type"
             real[6] <- sprintf("%.7f", df$Dec_Degrees_North) # "Latitude"

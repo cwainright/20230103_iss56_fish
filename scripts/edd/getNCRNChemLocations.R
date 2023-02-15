@@ -16,8 +16,8 @@ getNCRNChemLocations <- function(results_list, example){
             df <- dplyr::left_join(df, results_list$tbl_Meta_Events %>% select(Event_ID, Entered_by), by = "Event_ID")
             df <- dplyr::left_join(df, results_list$tbl_Locations %>% select(Location_ID, Loc_Name, NCRN_Site_ID, Unit_Code, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24,
                                                                              Elevation, State, County, Catchment_Area), by = "Location_ID")
-            df <- df %>% distinct(Location_ID, .keep_all = TRUE)
-            df <- df %>% select(Unit_Code, Location_ID, Loc_Name, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24, Elevation, State, County, Catchment_Area)
+            df <- df %>% distinct(NCRN_Site_ID, .keep_all = TRUE)
+            df <- df %>% select(Unit_Code, NCRN_Site_ID, Location_ID, Loc_Name, Dec_Degrees_North, Dex_Degrees_East, Datum, HUC, Reach_Code24, Elevation, State, County, Catchment_Area)
             
             #----- re-build `example` from `results_list`
             # starting point: copy the example dataframe but without data
@@ -26,7 +26,7 @@ getNCRNChemLocations <- function(results_list, example){
             
             real[1] <- "NCRN" # "#Org_Code"
             real[2] <- df$Unit_Code # "Park_Code" 
-            real[3] <- df$Location_ID # "Location_ID" shared field with `real_activities.Location_ID`
+            real[3] <- df$NCRN_Site_ID # "Location_ID" shared field with `real_activities.Location_ID`
             real[4] <- df$Loc_Name # "Location_Name"
             real[5] <- "Creek" # "Location_Type"
             real[6] <- sprintf("%.7f", df$Dec_Degrees_North) # "Latitude"

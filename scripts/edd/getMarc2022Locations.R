@@ -27,7 +27,7 @@ getMarc2022Locations <- function(marc2022, example, results_list){
             for(i in 1:nrow(real)){
                 real[i,2] <- stringr::str_extract(df$Station_Name[i], "[A-Z][A-Z][A-Z][A-Z]") # "Park_Code" 
             }
-            real[3] <- df$Station_ID # "Location_ID" shared field with `real_activities.Location_ID`
+            real[3] <- df$Reach_Name # "Location_ID" shared field with `real_activities.Location_ID`
             real[4] <- df$Station_Name # "Location_Name"
             real[5] <- "Creek" # "Location_Type"
             real[6] <- df$Dec_Degrees_North # "Latitude"
