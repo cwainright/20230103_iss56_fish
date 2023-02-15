@@ -37,7 +37,7 @@ getNCRNHabActivities <- function(results_list, example){
             
             real[1] <- "NCRN" # "#Org_Code" 
             real[2] <- "Stream habitat inventory" # "Project_ID"
-            real[3] <- df$Event_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
+            real[3] <- df$NCRN_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
             real[4] <- df$PHI_ID # "Activity_ID" shared field with `real_locations.Activity_ID` and `real_results.Activity_ID`
             real[5] <- "Field Msr/Obs" # "Activity_Type"; choices are: 1) 'Field Msr/Obs' and 2) 'Sample-Routine'
             real[6] <- "Water" # "Medium"  choices are "Water", "Air", and "Other" in `example`
@@ -58,7 +58,7 @@ getNCRNHabActivities <- function(results_list, example){
             real[21] <- df$Loc_Name # "Additional_Location_Info"
             real[22] <- NA # "Activity_Sampler"; the person who did the sampling?
             real[23] <- df$Entered_by # "Activity_Recorder"
-            real[24] <- df$NCRN_Site_ID # "Custody_ID" 
+            real[24] <- df$Event_Site_ID # "Custody_ID" 
             real[25] <- "NCRN" # "Activity_Conducting_Organization" 
             real[26] <- NA # "Station_Visit_Comment" 
             real[27] <- df$Comments # "Activity_Comment
@@ -75,7 +75,7 @@ getNCRNHabActivities <- function(results_list, example){
             real[38] <- NA # "Thermal_Preservative". Fish are preserved via chemicals, not wet ice
             real[39] <- NA # "Transport_Storage_Description" 
             real[40] <- df$Event_Group_ID # "Activity_Group_ID"
-            real[41] <- df$NCRN_Site_ID # "Activity_Group_Name" 
+            real[41] <- NA # "Activity_Group_Name" 
             real[42] <- ifelse(is.na(real[41])==TRUE,
                                paste0("Activities for: ", df$NCRN_Site_ID),
                                NA)# "Activity_Group_Type"  

@@ -25,7 +25,7 @@ getMarc2022Activities <- function(marc2022, example){
             
             acts[1] <- "NCRN" # "#Org_Code" 
             acts[2] <- "Biological Stream Survey Protocol" # "Project_ID"
-            acts[3] <- df$Station_ID # "Location_ID" 
+            acts[3] <- df$Reach_Name # "Location_ID" 
             acts[4] <- df$Pass_ID # "Activity_ID"
             acts[5] <- "Field Msr/Obs" # "Activity_Type"; choices are: 1) 'Field Msr/Obs' and 2) 'Sample-Routine'
             acts[6] <- "Water" # "Medium"  choices are "Water", "Air", and "Other" in `example`

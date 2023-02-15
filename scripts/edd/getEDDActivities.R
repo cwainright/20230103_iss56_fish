@@ -20,14 +20,14 @@ getEDDActivities <- function(results_list, marc2022, marc2021, habitat_marc2021,
             example <- readxl::read_excel("data/NCRN_BSS_EDD_20230105_1300.xlsx", sheet = "Activities") # https://doimspp.sharepoint.com/:x:/r/sites/NCRNDataManagement/Shared%20Documents/General/Standards/Data-Standards/EQuIS-WQX-EDD/NCRN_BSS_EDD_20230105_1300.xlsx?d=w8c283fde9cbd4af480945c8c8bd94ff6&csf=1&web=1&e=7Y9W1M
             
             #----- call NCRN project functions
-            ncrn_fish_activities <- getNCRNFishActivities(results_list, example)
-            ncrn_chem_activities <- getNCRNChemActivities(results_list, example)
-            ncrn_hab_activities <- getNCRNHabActivities(results_list, example)
+            ncrn_fish_activities <- getNCRNFishActivities(results_list, example) # updated to NCRN_Site_ID
+            ncrn_chem_activities <- getNCRNChemActivities(results_list, example) # updated to NCRN_Site_ID
+            ncrn_hab_activities <- getNCRNHabActivities(results_list, example) # updated to NCRN_Site_ID
             real <- rbind(ncrn_fish_activities, ncrn_chem_activities, ncrn_hab_activities) # row bind project function returns
             
             #----- if TRUE, call Marc project functions
             if(addMarc==TRUE){
-                marc2022_activities <- getMarc2022Activities(marc2022, example) # NCRN already has Marc's 2021 activities in db, so only add 2022
+                marc2022_activities <- getMarc2022Activities(marc2022, example) # updated to NCRN_Site_ID # NCRN already has Marc's 2021 activities in db, so only add 2022
                 marc_habitat_activities <- getMarcHabActivities(habitat_marc2022, habitat_marc2021, example, results_list) # NCRN doesn't have any of Marc's habitat data, so add both 2021 and 2022
                 real <- rbind(real, marc2022_activities, marc_habitat_activities) # row bind project function returns
             }

@@ -38,7 +38,7 @@ getNCRNFishActivities <- function(results_list, example){
             
             real[1] <- "NCRN" # "#Org_Code" 
             real[2] <- df$Protocol_Name # "Project_ID"
-            real[3] <- df$Event_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
+            real[3] <- df$NCRN_Site_ID # "Location_ID" shared field with `real_locations.Location_ID`
             real[4] <- df$Fish_Event_ID # "Activity_ID" shared field with `real_locations.Activity_ID` and `real_results.Activity_ID`
             real[5] <- "Field Msr/Obs" # "Activity_Type"; choices are: 1) 'Field Msr/Obs' and 2) 'Sample-Routine'
             real[6] <- "Water" # "Medium"  choices are "Water", "Air", and "Other" in `example`
@@ -72,7 +72,7 @@ getNCRNFishActivities <- function(results_list, example){
                        real[i,23] <- stringr::str_extract(real[i,23], "^*([0-9])+-([0-9])+.([0-9])+"),
                        real[i,23] <- real[i,23])# units are meters
             }
-            real[24] <- df$NCRN_Site_ID # "Custody_ID" 
+            real[24] <- df$Event_Site_ID # "Custody_ID" 
             real[25] <- "NCRN" # "Activity_Conducting_Organization" 
             real[26] <- NA # "Station_Visit_Comment" 
             real[27] <- df$Comments # "Activity_Comment
